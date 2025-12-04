@@ -1,6 +1,6 @@
 "use client";
 
-import { LoginCard } from "@/components/Auth/LoginCard";
+import { LoginCard } from "@/components/auth/cards/LoginCard";
 import { useGuestOnly } from "@/hooks/useGuestOnly";
 
 export default function LoginPage() {

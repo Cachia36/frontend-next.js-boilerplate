@@ -6,49 +6,8 @@ import { useRouter } from "next/navigation";
 import { useTheme } from "@/hooks/useTheme";
 import { useAuth } from "@/hooks/useAuth";
 import { cn } from "@/lib/utils";
-
-type ThemeToggleProps = {
-    isDark: boolean;
-    onToggle: () => void;
-};
-
-function ThemeToggle({ isDark, onToggle }: ThemeToggleProps) {
-    const [mounted, setMounted] = useState(false);
-
-    useEffect(() => {
-        setMounted(true);
-    }, []);
-
-    const checked = mounted ? isDark : false;
-
-    return (
-        <button
-            type="button"
-            onClick={onToggle}
-            role="switch"
-            aria-checked={checked}
-            className="flex items-center gap-2 focus:outline-none"
-        >
-            <span
-                className={cn(
-                    "relative inline-flex h-6 w-11 items-center rounded-full transition-colors border",
-                    isDark
-                        ? "bg-foreground border-foreground"
-                        : "bg-foreground border-foreground"
-                )}
-            >
-                <span
-                    className={cn(
-                        "inline-block h-5 w-5 rounded-full bg-background shadow transition-transform transform-gpu",
-                        // Only move the thumb after we’re mounted to avoid SSR/client mismatch
-                        mounted && isDark ? "translate-x-5" : "translate-x-1"
-                    )}
-                />
-            </span>
-        </button>
-    );
-}
-
+import { AuthActions } from "../auth/AuthActions";
+import { ThemeToggle } from "./ThemeToggle"
 
 export default function Navbar() {
     const { toggleTheme, effectiveTheme } = useTheme();
@@ -140,39 +99,16 @@ export default function Navbar() {
                 >
                     <div className="mt-6 flex flex-col items-center gap-6 px-4">
                         <div className="flex gap-4">
-                            {!loading && !isLoggedIn && (
-                                <>
-                                    <Link
-                                        href="/register"
-                                        onClick={closeMenu}
-                                        className="mt-2 px-6 py-2 text-sm"
-                                    >
-                                        Sign Up
-                                    </Link>
-
-                                    <Link
-                                        href="/login"
-                                        onClick={closeMenu}
-                                        className="mt-2 px-6 py-2 text-sm border rounded-full bg-foreground text-background"
-                                    >
-                                        Login
-                                    </Link>
-                                </>
-                            )}
-
-                            {!loading && isLoggedIn && (
-                                <button
-                                    type="button"
-                                    onClick={() => {
-                                        logout();
-                                        closeMenu();
-                                        router.push("/login");
-                                    }}
-                                    className="mt-2 px-6 py-2 text-sm border rounded-full bg-foreground text-background"
-                                >
-                                    Logout
-                                </button>
-                            )}
+                            <AuthActions
+                                loading={loading}
+                                isLoggedIn={isLoggedIn}
+                                onLinkClick={closeMenu}
+                                onLogout={() => {
+                                    logout();
+                                    closeMenu();
+                                    router.push("/login");
+                                }}
+                            />
                         </div>
 
                         <nav className="flex flex-col items-center gap-4 text-lg font-medium">
@@ -210,33 +146,15 @@ export default function Navbar() {
                 <div className="flex items-center gap-2">
                     <ThemeToggle isDark={isDark} onToggle={toggleTheme} />
 
-                    {!loading && !isLoggedIn && (
-                        <>
-                            <Link href="/register" className="px-4 py-2 text-sm">
-                                Sign Up
-                            </Link>
+                    <AuthActions
+                        loading={loading}
+                        isLoggedIn={isLoggedIn}
+                        onLogout={() => {
+                            logout();
+                            router.push("/login");
+                        }}
+                    />
 
-                            <Link
-                                href="/login"
-                                className="border rounded-full bg-foreground text-background px-4 py-2 text-sm"
-                            >
-                                Log in
-                            </Link>
-                        </>
-                    )}
-
-                    {!loading && isLoggedIn && (
-                        <button
-                            type="button"
-                            onClick={() => {
-                                logout();
-                                router.push("/login");
-                            }}
-                            className="border rounded-full bg-foreground text-background px-4 py-2 text-sm"
-                        >
-                            Logout
-                        </button>
-                    )}
                 </div>
             </div>
         </nav>

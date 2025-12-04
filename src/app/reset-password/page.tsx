@@ -1,6 +1,6 @@
 "use client";
 
-import { ResetPasswordCard } from "@/components/Auth/ResetPasswordCard";
+import { ResetPasswordCard } from "@/components/auth/cards/ResetPasswordCard";
 import { useSearchParams } from "next/navigation";
 import { useGuestOnly } from "@/hooks/useGuestOnly";
 

@@ -1,6 +1,6 @@
 "use client"
 
-import { ForgotPasswordCard } from "@/components/Auth/ForgotPasswordCard";
+import { ForgotPasswordCard } from "@/components/auth/cards/ForgotPasswordCard";
 import { useGuestOnly } from "@/hooks/useGuestOnly"
 
 export default function forgotPassword() {

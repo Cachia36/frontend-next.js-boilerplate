@@ -1,34 +1,55 @@
 "use client";
 
 import { useState } from "react";
-import { Loader2, KeyRound, MailCheck } from "lucide-react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { Loader2, KeyRound, CheckCircle2 } from "lucide-react";
 
-import { validateEmail } from "@/lib/validation/auth";
+import {
+  validatePassword,
+  validateConfirmPassword,
+} from "@/lib/validation/auth";
 import { cn } from "@/lib/utils";
-import { EmailField } from "./EmailField";
-import { forgotPasswordRequest } from "@/lib/auth/authClient";
+import { PasswordField } from "../fields/PasswordField";
+import { resetPasswordRequest } from "@/lib/auth/authClient";
 
 type FieldErrors = {
-  email?: string;
+  password?: string;
+  confirmPassword?: string;
 };
 
-export function ForgotPasswordCard() {
+type ResetPasswordCardProps = {
+  resetToken?: string;
+};
+
+export function ResetPasswordCard({ resetToken }: ResetPasswordCardProps) {
+  const router = useRouter();
+
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
   const [formMessage, setFormMessage] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const [email, setEmail] = useState("");
-  const [hasSentResetEmail, setHasSentResetEmail] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+
+  const [isResetSuccess, setIsResetSuccess] = useState(false);
 
   const clearFormMessage = () => setFormMessage(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (isSubmitting) return;
+    if (isSubmitting || isResetSuccess) return;
 
-    const emailErr = validateEmail(email);
-    const nextErrors: FieldErrors = { email: emailErr };
+    const passwordErr = validatePassword(password);
+    const confirmErr = validateConfirmPassword(confirmPassword, password);
+
+    const nextErrors: FieldErrors = {
+      password: passwordErr,
+      confirmPassword: confirmErr,
+    };
 
     if (Object.values(nextErrors).some(Boolean)) {
       setFieldErrors(nextErrors);
@@ -38,19 +59,20 @@ export function ForgotPasswordCard() {
     try {
       setIsSubmitting(true);
       clearFormMessage();
-      setHasSentResetEmail(false);
 
-      await forgotPasswordRequest(email);
+      await resetPasswordRequest(resetToken ?? "mock-token-for-now", password);
 
-      setHasSentResetEmail(true);
+      setIsResetSuccess(true);
+
+      setTimeout(() => {
+        router.push("/login");
+      }, 1500);
     } catch (err: any) {
-      setFormMessage(err?.message ?? "Failed to send reset email");
+      setFormMessage(err?.message ?? "Failed to reset password");
     } finally {
       setIsSubmitting(false);
     }
   };
-
-  const showSuccess = hasSentResetEmail;
 
   return (
     <div
@@ -65,23 +87,23 @@ export function ForgotPasswordCard() {
         <div
           className={cn(
             "w-12 h-12 rounded-2xl flex items-center justify-center text-xl shadow-xl transition-all duration-300 ease-out",
-            showSuccess ? "bg-emerald-500/15 text-emerald-500" : "bg-foreground/15"
+            isResetSuccess ? "bg-emerald-500/15 text-emerald-500" : "bg-foreground/15"
           )}
         >
-          {showSuccess ? (
-            <MailCheck className="w-5 h-5" />
+          {isResetSuccess ? (
+            <CheckCircle2 className="w-5 h-5" />
           ) : (
             <KeyRound className="w-5 h-5" />
           )}
         </div>
 
         <h2 className="mt-4 text-lg font-semibold">
-          {showSuccess ? "Email sent" : "Forgot password"}
+          {isResetSuccess ? "Success!" : "Reset password"}
         </h2>
 
         <p className="mt-1 text-xs text-center px-10 text-foreground/80">
-          {showSuccess
-            ? "If an account exists for this email, we've sent a password reset link."
+          {isResetSuccess
+            ? "Redirecting to login"
             : "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec sit"}
         </p>
       </div>
@@ -100,54 +122,86 @@ export function ForgotPasswordCard() {
             </p>
           )}
 
-          {/* Email */}
-          <EmailField
-            value={email}
-            error={fieldErrors.email}
+          {/* Password */}
+          <PasswordField
+            value={password}
+            error={fieldErrors.password}
+            placeholder="Password"
+            show={showPassword}
             onChange={(value) => {
-              setEmail(value);
+              setPassword(value);
 
-              if (fieldErrors.email) {
+              if (fieldErrors.password) {
                 setFieldErrors((prev) => ({
                   ...prev,
-                  email: validateEmail(value),
+                  password: validatePassword(value),
                 }));
               }
 
               if (formMessage) {
                 clearFormMessage();
               }
+            }}
+            onBlur={(value) => {
+              const err = validatePassword(value);
+              setFieldErrors((prev) => ({
+                ...prev,
+                password: err,
+              }));
+            }}
+            onToggleShow={() => setShowPassword((prev) => !prev)}
+            errorId="password-error"
+          />
 
-              if (hasSentResetEmail) {
-                setHasSentResetEmail(false);
+          {/* Confirm password */}
+          <PasswordField
+            value={confirmPassword}
+            error={fieldErrors.confirmPassword}
+            placeholder="Confirm password"
+            show={showConfirmPassword}
+            onChange={(value) => {
+              setConfirmPassword(value);
+
+              if (fieldErrors.confirmPassword) {
+                setFieldErrors((prev) => ({
+                  ...prev,
+                  confirmPassword: validateConfirmPassword(value, password),
+                }));
+              }
+
+              if (formMessage) {
+                clearFormMessage();
               }
             }}
             onBlur={(value) => {
-              const err = validateEmail(value);
+              const err = validateConfirmPassword(value, password);
               setFieldErrors((prev) => ({
                 ...prev,
-                email: err,
+                confirmPassword: err,
               }));
             }}
+            onToggleShow={() => setShowConfirmPassword((prev) => !prev)}
+            errorId="confirm-password-error"
           />
 
           {/* Primary button */}
           <button
             type="submit"
-            disabled={isSubmitting}
+            disabled={isSubmitting || isResetSuccess}
             className={cn(
               "w-full mt-1 rounded-3xl bg-foreground text-background py-2.5 text-sm font-semibold transition flex items-center justify-center gap-2",
               "hover:bg-foreground/80",
-              isSubmitting && "opacity-70 cursor-not-allowed hover:bg-foreground"
+              (isSubmitting || isResetSuccess) &&
+                "opacity-70 cursor-not-allowed hover:bg-foreground"
             )}
           >
-            {isSubmitting ? (
+            {isSubmitting || isResetSuccess ? (
               <>
                 <Loader2 className="w-4 h-4 animate-spin" />
-                <span>Sending...</span>
+                <span>{isResetSuccess ? "Redirecting..." : "Resetting..."}</span>
               </>
             ) : (
-              <>Send Email</>
+              <>Reset password</>
             )}
           </button>
 

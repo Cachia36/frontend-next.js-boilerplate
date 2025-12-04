@@ -3,26 +3,21 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Loader2, UserPlus } from "lucide-react";
+import { LogIn, Loader2 } from "lucide-react";
 
-import {
-  validateEmail,
-  validatePassword,
-  validateConfirmPassword,
-} from "@/lib/validation/auth";
+import { validateEmail, validatePassword } from "@/lib/validation/auth";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/hooks/useAuth";
-import { EmailField } from "./EmailField";
-import { PasswordField } from "./PasswordField";
-import { registerRequest } from "@/lib/auth/authClient";
+import { EmailField } from "../fields/EmailField";
+import { PasswordField } from "../fields/PasswordField";
+import { loginRequest } from "@/lib/auth/authClient";
 
 type FieldErrors = {
   email?: string;
   password?: string;
-  confirmPassword?: string;
 };
 
-export function RegisterCard() {
+export function LoginCard() {
   const router = useRouter();
   const { login } = useAuth();
 
@@ -31,11 +26,9 @@ export function RegisterCard() {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
 
   const clearFormMessage = () => setFormMessage(null);
 
@@ -45,13 +38,8 @@ export function RegisterCard() {
 
     const emailErr = validateEmail(email);
     const passwordErr = validatePassword(password);
-    const confirmErr = validateConfirmPassword(confirmPassword, password);
 
-    const nextErrors: FieldErrors = {
-      email: emailErr,
-      password: passwordErr,
-      confirmPassword: confirmErr,
-    };
+    const nextErrors: FieldErrors = { email: emailErr, password: passwordErr };
 
     if (Object.values(nextErrors).some(Boolean)) {
       setFieldErrors(nextErrors);
@@ -62,13 +50,11 @@ export function RegisterCard() {
       setIsSubmitting(true);
       clearFormMessage();
 
-      const data = await registerRequest(email, password);
+      const data = await loginRequest(email, password);
       login(data.user);
       router.push("/");
     } catch (err: any) {
-      setFormMessage(
-        err?.message ?? "Failed to create your account. Please try again."
-      );
+      setFormMessage(err?.message ?? "Failed to sign in");
     } finally {
       setIsSubmitting(false);
     }
@@ -90,10 +76,10 @@ export function RegisterCard() {
             "bg-foreground/15"
           )}
         >
-          <UserPlus className="w-5 h-5" />
+          <LogIn className="w-5 h-5" />
         </div>
 
-        <h2 className="mt-4 text-lg font-semibold">Create an account</h2>
+        <h2 className="mt-4 text-lg font-semibold">Sign in with email</h2>
 
         <p className="mt-1 text-xs text-center px-10 text-foreground/80">
           Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec sit
@@ -172,36 +158,15 @@ export function RegisterCard() {
             errorId="password-error"
           />
 
-          {/* Confirm password */}
-          <PasswordField
-            value={confirmPassword}
-            error={fieldErrors.confirmPassword}
-            placeholder="Confirm password"
-            show={showConfirmPassword}
-            onChange={(value) => {
-              setConfirmPassword(value);
-
-              if (fieldErrors.confirmPassword) {
-                setFieldErrors((prev) => ({
-                  ...prev,
-                  confirmPassword: validateConfirmPassword(value, password),
-                }));
-              }
-
-              if (formMessage) {
-                clearFormMessage();
-              }
-            }}
-            onBlur={(value) => {
-              const err = validateConfirmPassword(value, password);
-              setFieldErrors((prev) => ({
-                ...prev,
-                confirmPassword: err,
-              }));
-            }}
-            onToggleShow={() => setShowConfirmPassword((prev) => !prev)}
-            errorId="confirm-password-error"
-          />
+          {/* Forgot password link */}
+          <div className="flex justify-end">
+            <Link
+              href="/forgot-password"
+              className="text-xs font-medium hover:text-foreground/60"
+            >
+              Forgot password?
+            </Link>
+          </div>
 
           {/* Primary button */}
           <button
@@ -216,7 +181,7 @@ export function RegisterCard() {
             {isSubmitting ? (
               <>
                 <Loader2 className="w-4 h-4 animate-spin" />
-                <span>Creating account...</span>
+                <span>Signing in...</span>
               </>
             ) : (
               <>Get Started</>
@@ -227,7 +192,7 @@ export function RegisterCard() {
           <div className="flex items-center gap-3 pt-2">
             <span className="h-px flex-1 bg-foreground" />
             <span className="text-[10px] uppercase tracking-[0.18em] text-foreground">
-              Already have an account?
+              Don&apos;t have an account?
             </span>
             <span className="h-px flex-1 bg-foreground" />
           </div>
@@ -235,10 +200,10 @@ export function RegisterCard() {
           {/* Bottom link */}
           <div className="text-[10px] text-center">
             <Link
-              href="/login"
+              href="/register"
               className="text-xs font-medium text-foreground/60 hover:text-foreground/90"
             >
-              Click here to log in
+              Click here to register
             </Link>
           </div>
         </div>

@@ -1,6 +1,6 @@
 "use client"
 
-import { RegisterCard } from "@/components/Auth/RegisterCard";
+import { RegisterCard } from "@/components/auth/cards/RegisterCard";
 
 export default function LoginPage() {
     return (
