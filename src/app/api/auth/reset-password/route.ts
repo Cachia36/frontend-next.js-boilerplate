@@ -1,10 +1,11 @@
+// src/app/api/auth/reset-password/route.ts
 import { NextResponse } from "next/server";
 import { authService } from "@/lib/auth/authService";
-import jwt from "jsonwebtoken";
-import { JWT_SECRET } from "@/lib/env";
+import { repo } from "@/lib/auth/currentRepo";
 import { passwordSchema } from "@/lib/validation/authSchemas";
 import { ZodError } from "zod";
-import { HttpError } from "@/lib/errors";
+import { HttpError, createApiError } from "@/lib/errors";
+import { logAuthEvent } from "@/lib/logger";
 
 export async function POST(req: Request) {
   try {
@@ -12,49 +13,54 @@ export async function POST(req: Request) {
     const { token, password } = body ?? {};
 
     if (!token || !password) {
-      return NextResponse.json(
-        { message: "Token and password are required" },
-        { status: 400 }
+      const apiError = createApiError(
+        400,
+        "Token and password are required",
+        "VALIDATION_ERROR"
       );
+      return NextResponse.json(apiError, { status: apiError.status });
     }
 
-    try {
-      passwordSchema.parse(password);
-    } catch (error) {
-      if (error instanceof ZodError) {
-        const message = error.issues[0]?.message ?? "Invalid password";
-        return NextResponse.json({ message }, { status: 400 });
-      }
-      throw error;
+    const parsedPassword = passwordSchema.parse(password);
+
+    const user = await repo.findByPasswordResetToken(token);
+    if (!user) {
+      throw new HttpError(400, "Invalid or expired reset token", "TOKEN_INVALID");
     }
 
-    let payload: any;
-    try {
-      payload = jwt.verify(token, JWT_SECRET);
-    } catch {
-      return NextResponse.json(
-        { message: "Invalid or expired token" },
-        { status: 400 }
-      );
-    }
+    await authService.resetPassword(user.id, parsedPassword);
 
-    const userId = payload.sub as string | undefined;
-    if (!userId) {
-      return NextResponse.json(
-        { message: "Invalid token payload" },
-        { status: 400 }
-      );
-    }
-
-    await authService.resetPassword(userId, password);
+    logAuthEvent("password_reset_completed", { userId: user.id });
 
     return NextResponse.json(
       { message: "Password updated successfully" },
       { status: 200 }
     );
   } catch (error: any) {
-    const status = error instanceof HttpError ? error.statusCode : 500;
-    const message = error?.message ?? "Failed to reset password";
-    return NextResponse.json({ message }, { status });
+    if (error instanceof ZodError) {
+      const apiError = createApiError(
+        400,
+        "Invalid password",
+        "VALIDATION_ERROR"
+      );
+      return NextResponse.json(apiError, { status: apiError.status });
+    }
+
+    if (error instanceof HttpError) {
+      const apiError = createApiError(error.statusCode, error.message, error.code);
+      return NextResponse.json(apiError, { status: apiError.status });
+    }
+
+    logAuthEvent("password_reset_unexpected_error", {
+      error: error?.message ?? "Unknown error",
+    });
+
+    const apiError = createApiError(
+      500,
+      "Failed to reset password",
+      "PASSWORD_RESET_FAILED"
+    );
+    return NextResponse.json(apiError, { status: apiError.status });
+
   }
 }

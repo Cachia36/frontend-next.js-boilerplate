@@ -1,3 +1,4 @@
+// src/lib/auth/authService.test.ts
 import { describe, it, expect, beforeEach } from "vitest";
 import { authService } from "./authService";
 import { __memoryUserRepoTestUtils } from "./userRepository.memory";
@@ -9,7 +10,7 @@ describe("authService", () => {
     __memoryUserRepoTestUtils.reset();
   });
 
-  it("registers a new user and returns token + user", async () => {
+  it("registers a new user and returns tokens + user", async () => {
     const email = "test@example.com";
     const password = "Password1"; // matches frontend rules
 
@@ -18,7 +19,9 @@ describe("authService", () => {
     expect(result.user.email).toBe(email.toLowerCase());
     expect(result.user.id).toBeTruthy();
     expect(result.user.role).toBe("user");
-    expect(result.token).toBeTypeOf("string");
+
+    expect(result.accessToken).toBeTypeOf("string");
+    expect(result.refreshToken).toBeTypeOf("string");
   });
 
   it("does not allow duplicate emails", async () => {
@@ -37,11 +40,12 @@ describe("authService", () => {
     const password = "Password1";
 
     const reg = await authService.register(email, password);
-
     const login = await authService.login(email, password);
 
     expect(login.user.id).toBe(reg.user.id);
-    expect(login.token).toBeTypeOf("string");
+
+    expect(login.accessToken).toBeTypeOf("string");
+    expect(login.refreshToken).toBeTypeOf("string");
   });
 
   it("rejects login with wrong password", async () => {
@@ -76,6 +80,10 @@ describe("authService", () => {
     // New password should work
     const loginAfter = await authService.login(email, newPassword);
     expect(loginAfter.user.id).toBe(reg.user.id);
+
+    // Optional: also assert tokens exist on the new login result
+    expect(loginAfter.accessToken).toBeTypeOf("string");
+    expect(loginAfter.refreshToken).toBeTypeOf("string");
   });
 
   it("throws when resetting password for non-existent user", async () => {

@@ -34,7 +34,7 @@ describe("POST /api/auth/forgot-password", () => {
     const data = await res.json();
 
     expect(res.status).toBe(400);
-    expect(data.message).toBe("Email is required");
+    expect(data.message).toBe("Please enter a valid email address");
     expect(sendPasswordResetEmail).not.toHaveBeenCalled();
   });
 
@@ -63,7 +63,7 @@ describe("POST /api/auth/forgot-password", () => {
     const data = await res.json();
 
     expect(res.status).toBe(200);
-    expect(data.message).toBe("Reset link created");
+    expect(data.message).toBe("If that email exists, a reset link has been sent.");
     expect(typeof data.resetToken).toBe("string");
 
     expect(sendPasswordResetEmail).toHaveBeenCalledTimes(1);

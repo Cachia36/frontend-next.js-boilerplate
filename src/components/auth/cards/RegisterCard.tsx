@@ -11,10 +11,10 @@ import {
   validateConfirmPassword,
 } from "@/lib/validation/auth";
 import { cn } from "@/lib/utils";
-import { useAuth } from "@/hooks/useAuth";
 import { EmailField } from "../fields/EmailField";
 import { PasswordField } from "../fields/PasswordField";
 import { registerRequest } from "@/lib/auth/authClient";
+import { Button } from "@/components/ui/Button";
 
 type FieldErrors = {
   email?: string;
@@ -24,7 +24,6 @@ type FieldErrors = {
 
 export function RegisterCard() {
   const router = useRouter();
-  const { login } = useAuth();
 
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
   const [formMessage, setFormMessage] = useState<string | null>(null);
@@ -62,8 +61,8 @@ export function RegisterCard() {
       setIsSubmitting(true);
       clearFormMessage();
 
-      const data = await registerRequest(email, password);
-      login(data.user);
+      await registerRequest(email, password);
+
       router.push("/");
     } catch (err: any) {
       setFormMessage(
@@ -204,11 +203,11 @@ export function RegisterCard() {
           />
 
           {/* Primary button */}
-          <button
+          <Button
             type="submit"
             disabled={isSubmitting}
             className={cn(
-              "w-full mt-1 rounded-3xl bg-foreground text-background py-2.5 text-sm font-semibold transition flex items-center justify-center gap-2",
+              "w-full py-2.5 font-semibold transition flex items-center justify-center gap-2",
               "hover:bg-foreground/80",
               isSubmitting && "opacity-70 cursor-not-allowed hover:bg-foreground"
             )}
@@ -221,7 +220,7 @@ export function RegisterCard() {
             ) : (
               <>Get Started</>
             )}
-          </button>
+          </Button>
 
           {/* Divider */}
           <div className="flex items-center gap-3 pt-2">

@@ -4,10 +4,10 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { LogIn, Loader2 } from "lucide-react";
+import { Button } from "@/components/ui/Button";
 
 import { validateEmail, validatePassword } from "@/lib/validation/auth";
 import { cn } from "@/lib/utils";
-import { useAuth } from "@/hooks/useAuth";
 import { EmailField } from "../fields/EmailField";
 import { PasswordField } from "../fields/PasswordField";
 import { loginRequest } from "@/lib/auth/authClient";
@@ -19,7 +19,6 @@ type FieldErrors = {
 
 export function LoginCard() {
   const router = useRouter();
-  const { login } = useAuth();
 
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
   const [formMessage, setFormMessage] = useState<string | null>(null);
@@ -50,11 +49,15 @@ export function LoginCard() {
       setIsSubmitting(true);
       clearFormMessage();
 
-      const data = await loginRequest(email, password);
-      login(data.user);
+      await loginRequest(email, password);
+
       router.push("/");
     } catch (err: any) {
-      setFormMessage(err?.message ?? "Failed to sign in");
+      if (err.statusCode === 429) {
+        setFormMessage("Too many attempts. Please wait a minute and try again.");
+      } else {
+        setFormMessage(err?.message ?? "Failed to sign in");
+      }
     } finally {
       setIsSubmitting(false);
     }
@@ -169,11 +172,11 @@ export function LoginCard() {
           </div>
 
           {/* Primary button */}
-          <button
+          <Button
             type="submit"
             disabled={isSubmitting}
             className={cn(
-              "w-full mt-1 rounded-3xl bg-foreground text-background py-2.5 text-sm font-semibold transition flex items-center justify-center gap-2",
+              "w-full py-2.5 font-semibold transition flex items-center justify-center gap-2",
               "hover:bg-foreground/80",
               isSubmitting && "opacity-70 cursor-not-allowed hover:bg-foreground"
             )}
@@ -186,7 +189,7 @@ export function LoginCard() {
             ) : (
               <>Get Started</>
             )}
-          </button>
+          </Button>
 
           {/* Divider */}
           <div className="flex items-center gap-3 pt-2">

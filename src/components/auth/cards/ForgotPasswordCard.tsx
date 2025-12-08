@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Loader2, KeyRound, MailCheck } from "lucide-react";
 import Link from "next/link";
+import { Button } from "@/components/ui/Button";
 
 import { validateEmail } from "@/lib/validation/auth";
 import { cn } from "@/lib/utils";
@@ -132,11 +133,11 @@ export function ForgotPasswordCard() {
           />
 
           {/* Primary button */}
-          <button
+          <Button
             type="submit"
             disabled={isSubmitting}
             className={cn(
-              "w-full mt-1 rounded-3xl bg-foreground text-background py-2.5 text-sm font-semibold transition flex items-center justify-center gap-2",
+              "w-full py-2.5 font-semibold transition flex items-center justify-center gap-2",
               "hover:bg-foreground/80",
               isSubmitting && "opacity-70 cursor-not-allowed hover:bg-foreground"
             )}
@@ -149,7 +150,7 @@ export function ForgotPasswordCard() {
             ) : (
               <>Send Email</>
             )}
-          </button>
+          </Button>
 
           {/* Divider */}
           <div className="flex items-center gap-3 pt-2">

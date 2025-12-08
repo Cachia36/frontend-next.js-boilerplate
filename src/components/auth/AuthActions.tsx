@@ -1,5 +1,8 @@
+"use client"
+
 import Link from "next/link";
 import { Button } from "../ui/Button";
+
 type AuthActionsProps = {
   loading: boolean;
   isLoggedIn: boolean;
@@ -13,7 +16,11 @@ export function AuthActions({
   onLogout,
   onLinkClick,
 }: AuthActionsProps) {
-  if (loading) return null;
+  if (loading) {
+    return (
+      <div className="h-8 w-32 rounded-full bg-muted animate-pulse" />
+    );
+  }
 
   const linkProps = onLinkClick ? { onClick: onLinkClick } : {};
 
@@ -31,5 +38,15 @@ export function AuthActions({
     );
   }
 
-  return <Button onClick={onLogout}>Logout</Button>;
+  return (
+    <Button
+      variant="outline"
+      onClick={() => {
+        onLogout();
+        if (onLinkClick) onLinkClick();
+      }}
+    >
+      Sign out
+    </Button>
+  );
 }

@@ -1,14 +1,18 @@
 import { defineConfig } from "vitest/config";
+import dotenv from "dotenv";
 import path from "path";
 
+// Use absolute path to be safe
+dotenv.config({ path: path.resolve(__dirname, ".env.test") });
+
 export default defineConfig({
-    test: {
-        globals: true,
-        environment: "node",
+  test: {
+    globals: true,
+    environment: "node",
+  },
+  resolve: {
+    alias: {
+      "@": path.resolve(__dirname, "./src"),
     },
-    resolve: {
-        alias: {
-            "@": path.resolve(__dirname, "./src"),
-        },
-    },
+  },
 });

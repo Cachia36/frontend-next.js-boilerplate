@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect } from "react";
+import { Button } from "@/components/ui/Button";
+import Link from "next/link";
 
 type ErrorPageProps = {
   error: Error & { digest?: string };
@@ -14,26 +16,26 @@ export default function GlobalError({ error, reset }: ErrorPageProps) {
   }, [error]);
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center px-4">
+    <main className="flex-1 flex flex-col items-center justify-center px-4">
       <h1 className="text-3xl font-bold mb-2">Something went wrong</h1>
       <p className="text-muted-foreground mb-4 text-center max-w-md">
         An unexpected error occurred. You can try again or go back to the home page.
       </p>
 
       <div className="flex gap-3">
-        <button
+        <Button
           onClick={() => reset()}
-          className="rounded-full border px-4 py-2 text-sm font-medium hover:bg-accent hover:text-accent-foreground transition"
+          variant="outline"
         >
           Try again
-        </button>
+        </Button>
 
-        <a
-          href="/"
-          className="rounded-full px-4 py-2 text-sm font-medium bg-primary text-primary-foreground hover:opacity-90 transition"
+        <Link href="/"
+          className="px-4 py-2 text-sm rounded-full transition bg-foreground text-background border hover:cursor-default"
         >
           Go home
-        </a>
+        </Link>
+
       </div>
     </main>
   );

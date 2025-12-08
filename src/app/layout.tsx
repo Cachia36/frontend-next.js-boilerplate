@@ -1,4 +1,3 @@
-import { AuthProvider } from "@/hooks/useAuth";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "@/app/globals.css";
@@ -52,7 +51,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <head>
         <Script
           id="theme-init"
@@ -60,18 +59,14 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{ __html: themeInitCode }}
         />
       </head>
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen flex flex-col`}>
-        <AuthProvider>
-          <div className="min-h-screen flex flex-col">
-            <Navbar />
-
-            {/* Fills all space between navbar and footer */}
-            <main className="flex-1 flex flex-col">
-              {children}
-            </main>
-            <Footer />
-          </div>
-        </AuthProvider>
+      <body
+        className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen flex flex-col`}
+      >
+        <div className="min-h-screen flex flex-col">
+          <Navbar />
+          <main className="flex-1 flex flex-col">{children}</main>
+          <Footer />
+        </div>
       </body>
     </html>
   );

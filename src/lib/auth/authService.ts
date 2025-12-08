@@ -1,27 +1,25 @@
-import bcrypt from "bcryptjs";
-import jwt from "jsonwebtoken";
-
-import type { User } from "@/types/user";
-import { JWT_SECRET } from "../env";
+import type { User, DbUser } from "@/types/user";
 import { HttpError } from "../errors";
-
 import { repo } from "./currentRepo";
-
-const JWT_EXPIRES_IN = "7d";
-
-export type AuthTokenPayload = {
-  sub: string;
-  email: string;
-  role: string;
-};
+import { hashPassword, verifyPassword } from "./passwordService";
+import {
+  generateAccessToken,
+  generateRefreshToken,
+  verifyAccessToken,
+} from "./jwtService";
+import type { AuthTokenPayload } from "@/types/auth";
+import { logAuthEvent } from "../logger";
 
 export type AuthResult = {
   user: User;
-  token: string;
+  accessToken: string;
+  refreshToken: string;
 };
 
-function signToken(payload: AuthTokenPayload): string {
-  return jwt.sign(payload, JWT_SECRET, { expiresIn: JWT_EXPIRES_IN });
+function toPublicUser(dbUser: DbUser): User {
+  const { passwordHash, passwordResetToken, passwordResetExpiresAt, ...rest } =
+    dbUser;
+  return rest;
 }
 
 export const authService = {
@@ -29,84 +27,86 @@ export const authService = {
     const normalizedEmail = email.trim().toLowerCase();
 
     const existing = await repo.findByEmail(normalizedEmail);
-
     if (existing) {
-      const err = new Error("Email already in use");
-      // @ts-expect-error attach status for route handler
-      err.statusCode = 409;
-      throw err;
+      throw new HttpError(
+        409,
+        "Email already in use",
+        "AUTH_EMAIL_ALREADY_EXISTS"
+      );
     }
 
-    const passwordHash = await bcrypt.hash(password, 10);
+    const passwordHash = await hashPassword(password);
 
-    const user = await repo.createUser({
+    const created = await repo.createUser({
       email: normalizedEmail,
       passwordHash,
       role: "user",
     });
 
-    const token = signToken({
-      sub: user.id,
-      email: user.email,
-      role: user.role,
-    });
+    const user = toPublicUser(created);
+    const accessToken = generateAccessToken(user);
+    const refreshToken = generateRefreshToken(user);
 
-    return {
-      user: {
-        id: user.id,
-        email: user.email,
-        role: user.role,
-        createdAt: user.createdAt,
-      },
-      token,
-    };
+    logAuthEvent("register_success", { userId: user.id, email: user.email });
+
+    return { user, accessToken, refreshToken };
   },
 
   async login(email: string, password: string): Promise<AuthResult> {
     const normalizedEmail = email.trim().toLowerCase();
 
-    const user = await repo.findByEmail(normalizedEmail);
-    if (!user) {
-      const err = new Error("Invalid credentials");
-      // @ts-expect-error
-      err.statusCode = 401;
-      throw err;
+    const found = await repo.findByEmail(normalizedEmail);
+    if (!found) {
+      logAuthEvent("login_failed_no_user", { email: normalizedEmail });
+      throw new HttpError(401, "Invalid credentials", "AUTH_INVALID_CREDENTIALS");
     }
 
-    const isMatch = await bcrypt.compare(password, user.passwordHash);
-    if (!isMatch){
-      throw new HttpError(401, "Invalid credentials");
+    const match = await verifyPassword(password, found.passwordHash);
+    if (!match) {
+      logAuthEvent("login_failed_bad_password", { userId: found.id });
+      throw new HttpError(401, "Invalid credentials", "AUTH_INVALID_CREDENTIALS");
     }
 
-    const token = signToken({
-      sub: user.id,
-      email: user.email,
-      role: user.role,
-    });
+    const user = toPublicUser(found);
+    const accessToken = generateAccessToken(user);
+    const refreshToken = generateRefreshToken(user);
 
-    return {
-      user: {
-        id: user.id,
-        email: user.email,
-        role: user.role,
-        createdAt: user.createdAt,
-      },
-      token,
+    logAuthEvent("login_success", { userId: user.id });
+
+    return { user, accessToken, refreshToken };
+  },
+
+  async getUserFromAccessToken(token: string): Promise<User> {
+    const payload: AuthTokenPayload = verifyAccessToken(token);
+
+    const user: User = {
+      id: payload.sub,
+      email: payload.email,
+      role: payload.role,
+      createdAt: payload.createdAt,
     };
+
+    return user;
   },
 
   async resetPassword(userId: string, newPassword: string): Promise<void> {
-    const passwordHash = await bcrypt.hash(newPassword, 10);
+    const passwordHash = await hashPassword(newPassword);
 
     try {
       await repo.updatePassword(userId, passwordHash);
+      await repo.clearPasswordResetToken(userId);
+
+      logAuthEvent("password_reset_success", { userId });
     } catch (err: any) {
-      if (err instanceof HttpError){
+      if (err instanceof HttpError) {
         throw err;
       }
 
-      // anything else becomes a generic 500
-      throw new HttpError(500, "Failed to update password");
+      throw new HttpError(
+        500,
+        "Failed to update password",
+        "PASSWORD_RESET_FAILED"
+      );
     }
-  }
+  },
 };

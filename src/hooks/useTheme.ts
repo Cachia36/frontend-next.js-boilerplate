@@ -1,6 +1,6 @@
-// src/hooks/useTheme.ts
 
 import { useEffect, useState } from "react";
+import { useLocalStorage } from "./useLocalStorage";
 
 export type Theme = "light" | "dark" | "system";
 
@@ -18,7 +18,6 @@ function applyTheme(theme: Theme) {
   if (typeof window === "undefined") return;
 
   const root = document.documentElement;
-
   const effective = theme === "system" ? getSystemTheme() : theme;
 
   root.dataset.theme = effective;
@@ -33,24 +32,17 @@ function applyTheme(theme: Theme) {
 }
 
 export function useTheme() {
-  const [theme, setTheme] = useState<Theme>("system");
+  const [theme, setTheme] = useLocalStorage<Theme>(STORAGE_KEY, "system");
 
   useEffect(() => {
-    const stored = window.localStorage.getItem(STORAGE_KEY) as Theme | null;
-    const initial = stored || "system";
-
-    setTheme(initial);
-    applyTheme(initial);
-  }, []);
+    applyTheme(theme);
+  }, [theme]);
 
   const toggleTheme = () => {
     const effective = theme === "system" ? getSystemTheme() : theme;
-
     const next = effective === "light" ? "dark" : "light";
 
     setTheme(next);
-    window.localStorage.setItem(STORAGE_KEY, next);
-    applyTheme(next);
   };
 
   return {

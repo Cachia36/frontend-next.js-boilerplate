@@ -15,6 +15,19 @@ async function handleResponse<T>(res: Response, fallbackMessage: string): Promis
   return data as T;
 }
 
+export async function getCurrentUser(): Promise<{ user: any | null }> {
+  const res = await fetch("/api/auth/me", {
+    method: "GET",
+    credentials: "include",
+  });
+
+  if (!res.ok) {
+    throw new Error("Failed to fetch current user");
+  }
+
+  return res.json();
+}
+
 export async function loginRequest(email: string, password: string): Promise<AuthResult> {
   const res = await fetch("/api/auth/login", {
     method: "POST",
@@ -23,6 +36,17 @@ export async function loginRequest(email: string, password: string): Promise<Aut
   });
 
   return handleResponse<AuthResult>(res, "Failed to sign in");
+}
+
+export async function logoutRequest(): Promise<void> {
+  const res = await fetch("/api/auth/logout", {
+    method: "POST",
+    credentials: "include",
+  });
+
+  if (!res.ok) {
+    throw new Error("Failed to logout");
+  }
 }
 
 export async function registerRequest(email: string, password: string): Promise<AuthResult> {

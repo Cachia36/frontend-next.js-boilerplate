@@ -1,9 +1,11 @@
+// src/components/auth/ResetPasswordCard.tsx
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Loader2, KeyRound, CheckCircle2 } from "lucide-react";
+import { Button } from "@/components/ui/Button";
 
 import {
   validatePassword,
@@ -18,12 +20,12 @@ type FieldErrors = {
   confirmPassword?: string;
 };
 
-type ResetPasswordCardProps = {
-  resetToken?: string;
-};
-
-export function ResetPasswordCard({ resetToken }: ResetPasswordCardProps) {
+export function ResetPasswordCard() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+
+  // read token from the URL query string
+  const resetToken = searchParams.get("token");
 
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
   const [formMessage, setFormMessage] = useState<string | null>(null);
@@ -43,6 +45,11 @@ export function ResetPasswordCard({ resetToken }: ResetPasswordCardProps) {
     e.preventDefault();
     if (isSubmitting || isResetSuccess) return;
 
+    if (!resetToken) {
+      setFormMessage("This reset link is invalid or missing a token.");
+      return;
+    }
+
     const passwordErr = validatePassword(password);
     const confirmErr = validateConfirmPassword(confirmPassword, password);
 
@@ -60,7 +67,8 @@ export function ResetPasswordCard({ resetToken }: ResetPasswordCardProps) {
       setIsSubmitting(true);
       clearFormMessage();
 
-      await resetPasswordRequest(resetToken ?? "mock-token-for-now", password);
+      // send the actual token from the URL
+      await resetPasswordRequest(resetToken, password);
 
       setIsResetSuccess(true);
 
@@ -115,14 +123,12 @@ export function ResetPasswordCard({ resetToken }: ResetPasswordCardProps) {
         noValidate
       >
         <div className="space-y-3">
-          {/* Form-level message */}
           {formMessage && (
             <p className="text-xs text-red-500 px-1 text-center">
               {formMessage}
             </p>
           )}
 
-          {/* Password */}
           <PasswordField
             value={password}
             error={fieldErrors.password}
@@ -153,7 +159,6 @@ export function ResetPasswordCard({ resetToken }: ResetPasswordCardProps) {
             errorId="password-error"
           />
 
-          {/* Confirm password */}
           <PasswordField
             value={confirmPassword}
             error={fieldErrors.confirmPassword}
@@ -184,12 +189,11 @@ export function ResetPasswordCard({ resetToken }: ResetPasswordCardProps) {
             errorId="confirm-password-error"
           />
 
-          {/* Primary button */}
-          <button
+          <Button
             type="submit"
             disabled={isSubmitting || isResetSuccess}
             className={cn(
-              "w-full mt-1 rounded-3xl bg-foreground text-background py-2.5 text-sm font-semibold transition flex items-center justify-center gap-2",
+              "w-full py-2.5 font-semibold transition flex items-center justify-center gap-2",
               "hover:bg-foreground/80",
               (isSubmitting || isResetSuccess) &&
                 "opacity-70 cursor-not-allowed hover:bg-foreground"
@@ -203,9 +207,8 @@ export function ResetPasswordCard({ resetToken }: ResetPasswordCardProps) {
             ) : (
               <>Reset password</>
             )}
-          </button>
+          </Button>
 
-          {/* Divider */}
           <div className="flex items-center gap-3 pt-2">
             <span className="h-px flex-1 bg-foreground" />
             <span className="text-[10px] uppercase tracking-[0.18em] text-foreground">
@@ -214,7 +217,6 @@ export function ResetPasswordCard({ resetToken }: ResetPasswordCardProps) {
             <span className="h-px flex-1 bg-foreground" />
           </div>
 
-          {/* Bottom link */}
           <div className="text-[10px] text-center">
             <Link
               href="/login"
