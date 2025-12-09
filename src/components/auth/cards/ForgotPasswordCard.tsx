@@ -73,13 +73,13 @@ export function ForgotPasswordCard() {
         </div>
 
         <h2 className="mt-4 text-lg font-semibold">
-          {showSuccess ? "Email sent" : "Forgot password"}
+          {showSuccess ? "Email sent" : "Forgot your password?"}
         </h2>
 
         <p className="text-foreground/80 mt-1 px-10 text-center text-xs">
           {showSuccess
-            ? "If an account exists for this email, we've sent a password reset link."
-            : "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec sit"}
+            ? "If an account exists for this email, you'll receive reset instructions shortly."
+            : "Enter your email address and we'll send you a secure link to reset your password."}
         </p>
       </div>
 

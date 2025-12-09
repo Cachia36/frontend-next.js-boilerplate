@@ -86,10 +86,10 @@ export function RegisterCard() {
           <UserPlus className="h-5 w-5" />
         </div>
 
-        <h2 className="mt-4 text-lg font-semibold">Create an account</h2>
+        <h2 className="mt-4 text-lg font-semibold">Create your account</h2>
 
         <p className="text-foreground/80 mt-1 px-10 text-center text-xs">
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec sit
+          Sign up to get access to your personal dashboard and protected features.
         </p>
       </div>
 

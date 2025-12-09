@@ -6,11 +6,18 @@ import { Button } from "../ui/Button";
 type AuthActionsProps = {
   loading: boolean;
   isLoggedIn: boolean;
+  isAdmin?: boolean;
   onLogout: () => void;
   onLinkClick?: () => void;
 };
 
-export function AuthActions({ loading, isLoggedIn, onLogout, onLinkClick }: AuthActionsProps) {
+export function AuthActions({
+  loading,
+  isLoggedIn,
+  isAdmin = false,
+  onLogout,
+  onLinkClick
+}: AuthActionsProps) {
   if (loading) {
     return <div className="bg-muted h-8 w-32 animate-pulse rounded-full" />;
   }
@@ -32,14 +39,27 @@ export function AuthActions({ loading, isLoggedIn, onLogout, onLinkClick }: Auth
   }
 
   return (
-    <Button
-      variant="outline"
-      onClick={() => {
-        onLogout();
-        if (onLinkClick) onLinkClick();
-      }}
-    >
-      Sign out
-    </Button>
+    <>
+      {isAdmin && (
+        <Link href="/admin" {...linkProps}>
+          <Button variant="outline">Admin</Button>
+        </Link>
+      )}
+
+      <Link href="/dashboard" {...linkProps}>
+        <Button variant="outline">View Account</Button>
+      </Link>
+
+
+      <Button
+        onClick={() => {
+          onLogout();
+          if (onLinkClick) onLinkClick();
+        }}
+      >
+        Sign out
+      </Button>
+
+    </>
   );
 }

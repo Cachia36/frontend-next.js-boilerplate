@@ -82,10 +82,10 @@ export function LoginCard() {
           <LogIn className="h-5 w-5" />
         </div>
 
-        <h2 className="mt-4 text-lg font-semibold">Sign in with email</h2>
+        <h2 className="mt-4 text-lg font-semibold">Welcome back</h2>
 
         <p className="text-foreground/80 mt-1 px-10 text-center text-xs">
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec sit
+          Sign in with your account to access your dashboard and continue where you left off
         </p>
       </div>
 

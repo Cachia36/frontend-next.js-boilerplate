@@ -99,13 +99,13 @@ export function ResetPasswordCard() {
         </div>
 
         <h2 className="mt-4 text-lg font-semibold">
-          {isResetSuccess ? "Success!" : "Reset password"}
+          {isResetSuccess ? "Success!" : "Set a new password"}
         </h2>
 
         <p className="text-foreground/80 mt-1 px-10 text-center text-xs">
           {isResetSuccess
             ? "Redirecting to login"
-            : "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec sit"}
+            : "Choose a new secure password for your account."}
         </p>
       </div>
 
