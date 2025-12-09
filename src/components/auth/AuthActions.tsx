@@ -16,7 +16,7 @@ export function AuthActions({
   isLoggedIn,
   isAdmin = false,
   onLogout,
-  onLinkClick
+  onLinkClick,
 }: AuthActionsProps) {
   if (loading) {
     return <div className="bg-muted h-8 w-32 animate-pulse rounded-full" />;
@@ -50,7 +50,6 @@ export function AuthActions({
         <Button variant="outline">View Account</Button>
       </Link>
 
-
       <Button
         onClick={() => {
           onLogout();
@@ -59,7 +58,6 @@ export function AuthActions({
       >
         Sign out
       </Button>
-
     </>
   );
 }

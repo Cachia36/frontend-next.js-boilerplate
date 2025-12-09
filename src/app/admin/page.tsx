@@ -33,8 +33,8 @@ export default async function AdminDashboardPage() {
     <main className="p-8">
       <h1 className="text-2xl font-semibold">Admin Area</h1>
       <p className="mt-4">
-        This is an example of an admin-only route using role-based access
-        control on top of authentication.
+        This is an example of an admin-only route using role-based access control on top of
+        authentication.
       </p>
 
       <pre className="mt-4 rounded bg-slate-900 p-4 text-sm text-slate-100">
@@ -50,5 +50,4 @@ export default async function AdminDashboardPage() {
       </pre>
     </main>
   );
-
 }
