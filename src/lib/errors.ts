@@ -31,3 +31,15 @@ export function toApiError(
 
   return createApiError(fallback.status, fallback.message, fallback.code);
 }
+
+export const BadRequest = (message: string, code = "BAD_REQUEST") =>
+  new HttpError(400, message, code);
+
+export const Unauthorized = (message = "Unauthorized", code = "UNAUTHORIZED") =>
+  new HttpError(401, message, code);
+
+export const Forbidden = (message = "Forbidden", code = "FORBIDDEN") =>
+  new HttpError(403, message, code);
+
+export const NotFound = (message = "Not Found", code = "NOT_FOUND") =>
+  new HttpError(404, message, code);

@@ -1,7 +1,9 @@
+import { NODE_ENV } from "./env";
+
 type LogContext = Record<string, unknown>;
 
 function baseLog(level: "info" | "error" | "warn", message: string, context?: LogContext) {
-  if (process.env.NODE_ENV === "test") return;
+  if (NODE_ENV === "test") return;
 
   const payload = {
     level,

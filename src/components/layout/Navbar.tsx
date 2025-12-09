@@ -101,20 +101,20 @@ export default function Navbar() {
             <div className="relative h-5 w-5">
               <span
                 className={cn(
-                  "bg-foreground absolute left-0 h-[2px] w-5 transition-transform duration-200 ease-out",
-                  isOpen ? "translate-y-[6px] rotate-45" : "translate-y-[0px]",
+                  "bg-foreground absolute left-0 h-0.5 w-5 transition-transform duration-200 ease-out",
+                  isOpen ? "translate-y-1.5 rotate-45" : "translate-y-0",
                 )}
               />
               <span
                 className={cn(
-                  "bg-foreground absolute left-0 h-[2px] w-5 transition-all duration-200 ease-out",
-                  isOpen ? "opacity-0" : "translate-y-[6px] opacity-100",
+                  "bg-foreground absolute left-0 h-0.5 w-5 transition-all duration-200 ease-out",
+                  isOpen ? "opacity-0" : "translate-y-1.5 opacity-100",
                 )}
               />
               <span
                 className={cn(
-                  "bg-foreground absolute left-0 h-[2px] w-5 transition-transform duration-200 ease-out",
-                  isOpen ? "translate-y-[6px] -rotate-45" : "translate-y-[12px]",
+                  "bg-foreground absolute left-0 h-0.5 w-5 transition-transform duration-200 ease-out",
+                  isOpen ? "translate-y-1.5 -rotate-45" : "translate-y-3",
                 )}
               />
             </div>
@@ -178,7 +178,7 @@ export default function Navbar() {
             <Link
               key={`${link.href}-${link.label}`}
               href={link.href}
-              className="after:bg-foreground relative text-sm font-medium after:absolute after:-bottom-1 after:left-0 after:h-[2px] after:w-0 after:transition-all after:duration-300 hover:after:w-full"
+              className="after:bg-foreground relative text-sm font-medium after:absolute after:-bottom-1 after:left-0 after:h-0.5 after:w-0 after:transition-all after:duration-300 hover:after:w-full"
             >
               {link.label}
             </Link>

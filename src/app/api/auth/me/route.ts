@@ -1,10 +1,10 @@
-// src/app/api/auth/me/route.ts
 import { NextResponse } from "next/server";
 import { authService } from "@/lib/auth/authService";
-import { HttpError, createApiError } from "@/lib/errors";
+import { HttpError } from "@/lib/errors";
 import { logAuthEvent } from "@/lib/logger";
+import { withApiRoute } from "@/lib/withApiRoute";
 
-export async function GET(req: Request) {
+const handler = async (req: Request): Promise<Response> => {
   try {
     const cookieHeader = req.headers.get("cookie") ?? "";
 
@@ -21,7 +21,7 @@ export async function GET(req: Request) {
 
     const user = await authService.getUserFromAccessToken(accessToken);
     return NextResponse.json({ user }, { status: 200 });
-  } catch (error: any) {
+  } catch (error: unknown) {
     // Token invalid or user missing → treat as logged out
     if (error instanceof HttpError && (error.statusCode === 401 || error.statusCode === 404)) {
       logAuthEvent("me_token_invalid_or_user_missing", {
@@ -32,13 +32,9 @@ export async function GET(req: Request) {
       return NextResponse.json({ user: null }, { status: 200 });
     }
 
-    // Real unexpected error
-    logAuthEvent("me_unexpected_error", {
-      error: error?.message ?? "Unknown error",
-    });
-
-    const apiError = createApiError(500, "Failed to fetch current user", "ME_UNEXPECTED_ERROR");
-
-    return NextResponse.json(apiError, { status: apiError.status });
+    // For any other errors, let the global handler + logger handle it
+    throw error;
   }
-}
+};
+
+export const GET = withApiRoute(handler);
