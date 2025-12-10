@@ -1,4 +1,3 @@
-// app/page.tsx
 import Link from "next/link";
 import type { Metadata } from "next";
 import { PageShell } from "@/components/layout/page-shell";

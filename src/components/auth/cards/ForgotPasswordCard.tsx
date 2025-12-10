@@ -1,26 +1,23 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
-import { Loader2, KeyRound, MailCheck } from "lucide-react";
 import Link from "next/link";
-import { Button } from "@/components/ui/Button";
+import { MailQuestion, Loader2 } from "lucide-react";
 
-import { validateEmail } from "@/lib/validation/auth";
+import { Button } from "@/components/ui/Button";
 import { cn } from "@/lib/utils";
 import { EmailField } from "../fields/EmailField";
+import { validateEmail } from "@/lib/validation/auth";
 import { forgotPasswordRequest } from "@/lib/auth/authClient";
 
-type FieldErrors = {
-  email?: string;
-};
+type ApiError = Error & { statusCode?: number };
 
 export function ForgotPasswordCard() {
-  const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
+  const [email, setEmail] = useState("");
+  const [fieldError, setFieldError] = useState<string | undefined>();
   const [formMessage, setFormMessage] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
-
-  const [email, setEmail] = useState("");
-  const [hasSentResetEmail, setHasSentResetEmail] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
 
   const clearFormMessage = () => setFormMessage(null);
 
@@ -29,135 +26,121 @@ export function ForgotPasswordCard() {
     if (isSubmitting) return;
 
     const emailErr = validateEmail(email);
-    const nextErrors: FieldErrors = { email: emailErr };
-
-    if (Object.values(nextErrors).some(Boolean)) {
-      setFieldErrors(nextErrors);
+    if (emailErr) {
+      setFieldError(emailErr);
       return;
     }
 
     try {
       setIsSubmitting(true);
       clearFormMessage();
-      setHasSentResetEmail(false);
+      setShowSuccess(false);
 
       await forgotPasswordRequest(email);
 
-      setHasSentResetEmail(true);
+      setShowSuccess(true);
     } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : "Failed to send reset email";
-      setFormMessage(message);
+      const error = err as ApiError;
+      if (error.statusCode === 429) {
+        setFormMessage("Too many requests. Please wait and try again.");
+      } else {
+        setFormMessage(error.message ?? "Unable to send reset email");
+      }
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  const showSuccess = hasSentResetEmail;
-
   return (
     <div
       className={cn(
-        "w-full max-w-sm overflow-hidden rounded-3xl border shadow-xl",
+        "border-border bg-background/90 w-full max-w-md rounded-3xl border shadow-lg",
         "transition-all duration-300 ease-out",
-        "hover:border-foreground/50 hover:-translate-y-[2px] hover:shadow-2xl",
+        "hover:border-foreground/20 hover:shadow-xl",
       )}
     >
       {/* Header */}
-      <div className="flex flex-col items-center pt-8 pb-4">
-        <div
-          className={cn(
-            "flex h-12 w-12 items-center justify-center rounded-2xl text-xl shadow-xl transition-all duration-300 ease-out",
-            showSuccess ? "bg-success/15 text-success" : "bg-muted text-muted-foreground",
-          )}
-        >
-          {showSuccess ? <MailCheck className="h-5 w-5" /> : <KeyRound className="h-5 w-5" />}
+      <div className="flex flex-col items-center pt-10 pb-6">
+        <div className="bg-muted text-foreground ring-border flex h-14 w-14 items-center justify-center rounded-2xl text-lg shadow-sm ring-1">
+          <MailQuestion className="h-6 w-6" />
         </div>
 
-        <h2 className="mt-4 text-lg font-semibold">
-          {showSuccess ? "Email sent" : "Forgot your password?"}
-        </h2>
+        <h2 className="mt-5 text-2xl font-semibold tracking-tight">Forgot your password?</h2>
 
-        <p className="text-foreground/80 mt-1 px-10 text-center text-xs">
-          {showSuccess
-            ? "If an account exists for this email, you'll receive reset instructions shortly."
-            : "Enter your email address and we'll send you a secure link to reset your password."}
+        <p className="text-muted-foreground mt-2 max-w-[320px] px-4 text-center text-sm leading-relaxed">
+          Enter the email you used to sign up and we&apos;ll send you a secure link to reset your
+          password.
         </p>
       </div>
 
       {/* Form */}
-      <form onSubmit={handleSubmit} className="space-y-4 px-6 pt-2 pb-6" noValidate>
-        <div className="space-y-3">
-          {/* Form-level message */}
-          {formMessage && <p className="text-error px-1 text-center text-xs">{formMessage}</p>}
-          {/* Email */}
-          <EmailField
-            value={email}
-            error={fieldErrors.email}
-            onChange={(value) => {
-              setEmail(value);
+      <form onSubmit={handleSubmit} className="space-y-5 px-8 pb-10" noValidate>
+        {formMessage && <p className="text-error px-1 text-center text-sm">{formMessage}</p>}
 
-              if (fieldErrors.email) {
-                setFieldErrors((prev) => ({
-                  ...prev,
-                  email: validateEmail(value),
-                }));
-              }
+        <EmailField
+          value={email}
+          error={fieldError}
+          onChange={(value) => {
+            setEmail(value);
+            if (fieldError) {
+              setFieldError(validateEmail(value));
+            }
+            if (formMessage) clearFormMessage();
+          }}
+          onBlur={(value) => {
+            setFieldError(validateEmail(value));
+          }}
+        />
 
-              if (formMessage) {
-                clearFormMessage();
-              }
+        {/** Success/info message */}
+        <div
+          className={cn(
+            "mt-1 rounded-xl border px-3 py-2 text-xs leading-relaxed transition-colors",
+            showSuccess
+              ? "border-success/70 bg-success/15 text-success"
+              : "border-border bg-muted text-muted-foreground",
+          )}
+        >
+          {showSuccess
+            ? "If an account exists for that email, a reset link has been sent. Please check your inbox and spam folder."
+            : "You will receive an email with a password reset link if there is an account associated with this address."}
+        </div>
 
-              if (hasSentResetEmail) {
-                setHasSentResetEmail(false);
-              }
-            }}
-            onBlur={(value) => {
-              const err = validateEmail(value);
-              setFieldErrors((prev) => ({
-                ...prev,
-                email: err,
-              }));
-            }}
-          />
+        <Button
+          type="submit"
+          disabled={isSubmitting}
+          className={cn(
+            "mt-1 flex h-12 w-full items-center justify-center gap-2 rounded-full text-base font-semibold",
+            isSubmitting && "cursor-not-allowed opacity-70",
+          )}
+        >
+          {isSubmitting ? (
+            <>
+              <Loader2 className="h-5 w-5 animate-spin" />
+              Sending reset link...
+            </>
+          ) : (
+            "Send reset link"
+          )}
+        </Button>
 
-          {/* Primary button */}
-          <Button
-            type="submit"
-            disabled={isSubmitting}
-            className={cn(
-              "flex w-full items-center justify-center gap-2 py-2.5 font-semibold transition",
-              "hover:bg-foreground/80",
-              isSubmitting && "hover:bg-foreground cursor-not-allowed opacity-70",
-            )}
+        {/* Divider */}
+        <div className="flex items-center gap-4 pt-4">
+          <span className="bg-border h-px w-full" />
+          <span className="text-muted-foreground text-[11px] tracking-[0.2em] uppercase">
+            Remembered it?
+          </span>
+          <span className="bg-border h-px w-full" />
+        </div>
+
+        {/* Back to login */}
+        <div className="text-center">
+          <Link
+            href="/login"
+            className="text-muted-foreground hover:text-foreground text-sm font-medium"
           >
-            {isSubmitting ? (
-              <>
-                <Loader2 className="h-4 w-4 animate-spin" />
-                <span>Sending...</span>
-              </>
-            ) : (
-              <>Send Email</>
-            )}
-          </Button>
-
-          {/* Divider */}
-          <div className="flex items-center gap-3 pt-2">
-            <span className="bg-border h-px flex-1" />
-            <span className="text-muted-foreground text-[10px] tracking-[0.18em] uppercase">
-              ...
-            </span>
-            <span className="bg-border h-px flex-1" />
-          </div>
-
-          {/* Bottom link */}
-          <div className="text-center text-[10px]">
-            <Link
-              href="/login"
-              className="text-muted-foreground hover:text-foreground text-xs font-medium"
-            >
-              Return to login
-            </Link>
-          </div>
+            Return to login
+          </Link>
         </div>
       </form>
     </div>

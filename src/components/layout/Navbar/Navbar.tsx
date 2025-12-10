@@ -84,39 +84,53 @@ export default function Navbar() {
   };
 
   return (
-    <nav className="bg-background sticky top-0 z-50 w-full border-b px-4 py-4">
+    <nav className="bg-background/80 border-border supports-backdrop-filter:bg-background/60 sticky top-0 z-50 w-full border-b px-4 py-3 backdrop-blur">
       {/* MOBILE: top row */}
       <div className="flex items-center justify-between md:hidden">
-        <div className="text-lg font-bold">Boilerplate</div>
+        <div className="flex flex-col">
+          <span className="text-muted-foreground text-[11px] font-semibold tracking-[0.18em] uppercase">
+            Auth Boilerplate
+          </span>
+          <span className="text-muted-foreground/80 text-[11px]">Next.js · TypeScript · JWT</span>
+        </div>
         <div className="flex flex-row gap-4">
           <ThemeToggle isDark={isDark} onToggle={toggleTheme} />
           <button
             type="button"
             onClick={() => setIsOpen((prev) => !prev)}
-            className="focus-visible:ring-foreground rounded-md border p-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
+            className={cn(
+              "border-border bg-muted/70 text-foreground relative inline-flex h-9 w-9 items-center justify-center rounded-full border shadow-sm transition-colors duration-200",
+              "focus-visible:ring-foreground focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none",
+              isOpen && "bg-foreground text-background border-foreground",
+            )}
             aria-label="Toggle navigation menu"
             aria-expanded={isOpen}
           >
-            <div className="relative h-5 w-5">
-              <span
-                className={cn(
-                  "bg-foreground absolute left-0 h-0.5 w-5 transition-transform duration-200 ease-out",
-                  isOpen ? "translate-y-1.5 rotate-45" : "translate-y-0",
-                )}
-              />
-              <span
-                className={cn(
-                  "bg-foreground absolute left-0 h-0.5 w-5 transition-all duration-200 ease-out",
-                  isOpen ? "opacity-0" : "translate-y-1.5 opacity-100",
-                )}
-              />
-              <span
-                className={cn(
-                  "bg-foreground absolute left-0 h-0.5 w-5 transition-transform duration-200 ease-out",
-                  isOpen ? "translate-y-1.5 -rotate-45" : "translate-y-3",
-                )}
-              />
-            </div>
+            <span className="sr-only">Toggle navigation menu</span>
+
+            {/* Top line */}
+            <span
+              className={cn(
+                "absolute h-0.5 w-4 rounded-full bg-current transition-all duration-300",
+                isOpen ? "translate-y-0 rotate-45" : "-translate-y-1.5 rotate-0",
+              )}
+            />
+
+            {/* Middle line */}
+            <span
+              className={cn(
+                "absolute h-0.5 w-4 rounded-full bg-current transition-all duration-300",
+                isOpen ? "opacity-0" : "opacity-100",
+              )}
+            />
+
+            {/* Bottom line */}
+            <span
+              className={cn(
+                "absolute h-0.5 w-4 rounded-full bg-current transition-all duration-300",
+                isOpen ? "translate-y-0 -rotate-45" : "translate-y-1.5 rotate-0",
+              )}
+            />
           </button>
         </div>
       </div>
@@ -130,6 +144,7 @@ export default function Navbar() {
         isAdmin={isAdmin}
         onClose={closeMenu}
         onLogout={handleLogout}
+        currentPath={pathname ?? "/"}
       />
 
       {/* DESKTOP */}
@@ -141,6 +156,7 @@ export default function Navbar() {
         isLoggedIn={isLoggedIn}
         isAdmin={isAdmin}
         onLogout={handleLogout}
+        currentPath={pathname ?? "/"}
       />
     </nav>
   );

@@ -15,14 +15,16 @@ export function EmailField({ value, error, onChange, onBlur }: EmailFieldProps) 
     <div className="space-y-1">
       <div
         className={cn(
-          "flex items-center gap-2 rounded-xl border px-3 py-2 transition-colors duration-200 focus-within:ring-2",
+          "border-border bg-background/80 flex h-12 items-center gap-2 rounded-full border px-4 text-sm shadow-sm",
+          "focus-within:ring-border transition-colors duration-200 focus-within:ring-2",
           error && "border-error focus-within:ring-error",
         )}
       >
-        <Mail />
+        <Mail className="text-muted-foreground h-4 w-4" />
+
         <input
           type="email"
-          className="placeholder:text-foreground/60 w-full text-sm focus:outline-none"
+          className="text-foreground placeholder:text-muted-foreground w-full bg-transparent text-sm focus:outline-none"
           placeholder="Email"
           value={value}
           onChange={(e) => onChange(e.target.value)}

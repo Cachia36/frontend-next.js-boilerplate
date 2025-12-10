@@ -1,15 +1,14 @@
-// src/components/auth/ResetPasswordCard.tsx
 "use client";
 
+import { useSearchParams, useRouter } from "next/navigation";
 import { useState, type FormEvent } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { Loader2, KeyRound, CheckCircle2 } from "lucide-react";
-import { Button } from "@/components/ui/Button";
+import { ShieldCheck, Loader2 } from "lucide-react";
 
-import { validatePassword, validateConfirmPassword } from "@/lib/validation/auth";
+import { Button } from "@/components/ui/Button";
 import { cn } from "@/lib/utils";
 import { PasswordField } from "../fields/PasswordField";
+import { validatePassword, validateConfirmPassword } from "@/lib/validation/auth";
 import { resetPasswordRequest } from "@/lib/auth/authClient";
 
 type FieldErrors = {
@@ -17,197 +16,210 @@ type FieldErrors = {
   confirmPassword?: string;
 };
 
+type ApiError = Error & { statusCode?: number };
+
 export function ResetPasswordCard() {
-  const router = useRouter();
   const searchParams = useSearchParams();
+  const router = useRouter();
 
-  // read token from the URL query string
-  const resetToken = searchParams.get("token");
-
-  const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
-  const [formMessage, setFormMessage] = useState<string | null>(null);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const token = searchParams.get("token");
 
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
+  const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
+  const [formMessage, setFormMessage] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [isResetSuccess, setIsResetSuccess] = useState(false);
+
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
 
   const clearFormMessage = () => setFormMessage(null);
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (isSubmitting || isResetSuccess) return;
+    if (isSubmitting) return;
 
-    if (!resetToken) {
-      setFormMessage("This reset link is invalid or missing a token.");
+    // Reject missing or short token BEFORE calling API
+    if (!token || token.length < 16) {
+      setFormMessage("This reset link is invalid or has expired.");
       return;
     }
 
-    const passwordErr = validatePassword(password);
-    const confirmErr = validateConfirmPassword(confirmPassword, password);
-
-    const nextErrors: FieldErrors = {
-      password: passwordErr,
-      confirmPassword: confirmErr,
+    const errors: FieldErrors = {
+      password: validatePassword(password),
+      confirmPassword: validateConfirmPassword(password, confirmPassword),
     };
 
-    if (Object.values(nextErrors).some(Boolean)) {
-      setFieldErrors(nextErrors);
+    if (Object.values(errors).some(Boolean)) {
+      setFieldErrors(errors);
       return;
     }
 
     try {
       setIsSubmitting(true);
       clearFormMessage();
+      setIsResetSuccess(false);
 
-      // send the actual token from the URL
-      await resetPasswordRequest(resetToken, password);
+      await resetPasswordRequest(token, password);
 
       setIsResetSuccess(true);
 
+      // Auto-redirect after short delay
       setTimeout(() => {
         router.push("/login");
-      }, 1500);
+      }, 1800);
     } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : "Failed to reset password";
-      setFormMessage(message);
+      const error = err as ApiError;
+      if (error.statusCode === 429) {
+        setFormMessage("Too many attempts. Please wait and try again.");
+      } else {
+        setFormMessage(error.message ?? "Unable to reset password");
+      }
     } finally {
       setIsSubmitting(false);
     }
   };
 
+  const isTokenInvalid = !token || token.length < 16;
+
   return (
     <div
       className={cn(
-        "w-full max-w-sm overflow-hidden rounded-3xl border shadow-xl",
-        "transition-all duration-300 ease-out",
-        "hover:border-foreground/50 hover:-translate-y-[2px] hover:shadow-2xl",
+        "border-border bg-background/90 w-full max-w-md rounded-3xl border shadow-lg transition-all duration-300 ease-out",
+        "hover:border-foreground/20 hover:shadow-xl",
+        isResetSuccess &&
+          // subtle success glow + tiny scale up
+          "border-success/70 shadow-success/20 ring-success/40 scale-[1.01] shadow-lg ring-2",
       )}
     >
       {/* Header */}
-      <div className="flex flex-col items-center pt-8 pb-4">
+      <div className="flex flex-col items-center pt-10 pb-6">
         <div
           className={cn(
-            "flex h-12 w-12 items-center justify-center rounded-2xl text-xl shadow-xl transition-all duration-300 ease-out",
-            isResetSuccess ? "bg-success/15 text-success" : "bg-muted text-muted-foreground",
+            "bg-muted text-foreground ring-border flex h-14 w-14 items-center justify-center rounded-2xl text-lg shadow-sm ring-1 transition-colors duration-300",
+            isResetSuccess &&
+              "bg-success/15 text-success ring-success/60 animate-in fade-in-zoom-in-95",
           )}
         >
-          {isResetSuccess ? <CheckCircle2 className="h-5 w-5" /> : <KeyRound className="h-5 w-5" />}
+          <ShieldCheck className="h-6 w-6" />
         </div>
 
-        <h2 className="mt-4 text-lg font-semibold">
-          {isResetSuccess ? "Success!" : "Set a new password"}
-        </h2>
+        <h2 className="mt-5 text-2xl font-semibold tracking-tight">Set a new password</h2>
 
-        <p className="text-foreground/80 mt-1 px-10 text-center text-xs">
-          {isResetSuccess
-            ? "Redirecting to login"
-            : "Choose a new secure password for your account."}
+        <p className="text-muted-foreground mt-2 max-w-[320px] px-4 text-center text-sm leading-relaxed">
+          Choose a strong password. After resetting, you’ll be redirected to the login screen.
         </p>
       </div>
 
-      {/* Form */}
-      <form onSubmit={handleSubmit} className="space-y-4 px-6 pt-2 pb-6" noValidate>
-        <div className="space-y-3">
-          {formMessage && <p className="text-error px-1 text-center text-xs">{formMessage}</p>}
-          <PasswordField
-            value={password}
-            error={fieldErrors.password}
-            placeholder="Password"
-            show={showPassword}
-            onChange={(value) => {
-              setPassword(value);
+      <form onSubmit={handleSubmit} className="space-y-5 px-8 pb-10" noValidate>
+        {(formMessage || isTokenInvalid) && (
+          <p className="text-error px-1 text-center text-sm">
+            {formMessage ?? "This reset link is invalid or has expired. Please request a new one."}
+          </p>
+        )}
 
-              if (fieldErrors.password) {
-                setFieldErrors((prev) => ({
-                  ...prev,
-                  password: validatePassword(value),
-                }));
-              }
-
-              if (formMessage) {
-                clearFormMessage();
-              }
-            }}
-            onBlur={(value) => {
-              const err = validatePassword(value);
+        <PasswordField
+          value={password}
+          error={fieldErrors.password}
+          placeholder="New password"
+          show={showPassword}
+          onChange={(value) => {
+            setPassword(value);
+            if (fieldErrors.password) {
               setFieldErrors((prev) => ({
                 ...prev,
-                password: err,
+                password: validatePassword(value),
               }));
-            }}
-            onToggleShow={() => setShowPassword((prev) => !prev)}
-            errorId="password-error"
-          />
-
-          <PasswordField
-            value={confirmPassword}
-            error={fieldErrors.confirmPassword}
-            placeholder="Confirm password"
-            show={showConfirmPassword}
-            onChange={(value) => {
-              setConfirmPassword(value);
-
-              if (fieldErrors.confirmPassword) {
-                setFieldErrors((prev) => ({
-                  ...prev,
-                  confirmPassword: validateConfirmPassword(value, password),
-                }));
-              }
-
-              if (formMessage) {
-                clearFormMessage();
-              }
-            }}
-            onBlur={(value) => {
-              const err = validateConfirmPassword(value, password);
+            }
+            if (fieldErrors.confirmPassword) {
               setFieldErrors((prev) => ({
                 ...prev,
-                confirmPassword: err,
+                confirmPassword: validateConfirmPassword(value, confirmPassword),
               }));
-            }}
-            onToggleShow={() => setShowConfirmPassword((prev) => !prev)}
-            errorId="confirm-password-error"
-          />
+            }
+            if (formMessage) clearFormMessage();
+          }}
+          onBlur={(value) => {
+            const err = validatePassword(value);
+            setFieldErrors((prev) => ({ ...prev, password: err }));
+          }}
+          onToggleShow={() => setShowPassword((prev) => !prev)}
+          errorId="reset-password-error"
+        />
 
-          <Button
-            type="submit"
-            disabled={isSubmitting || isResetSuccess}
-            className={cn(
-              "flex w-full items-center justify-center gap-2 py-2.5 font-semibold transition",
-              "hover:bg-foreground/80",
-              (isSubmitting || isResetSuccess) &&
-                "hover:bg-foreground cursor-not-allowed opacity-70",
-            )}
+        <PasswordField
+          value={confirmPassword}
+          error={fieldErrors.confirmPassword}
+          placeholder="Confirm new password"
+          show={showConfirm}
+          onChange={(value) => {
+            setConfirmPassword(value);
+            setFieldErrors((prev) => ({
+              ...prev,
+              confirmPassword: validateConfirmPassword(password, value),
+            }));
+            if (formMessage) clearFormMessage();
+          }}
+          onBlur={(value) => {
+            const err = validateConfirmPassword(password, value);
+            setFieldErrors((prev) => ({ ...prev, confirmPassword: err }));
+          }}
+          onToggleShow={() => setShowConfirm((prev) => !prev)}
+          errorId="reset-confirm-password-error"
+        />
+
+        {/* Success / Info Box */}
+        <div
+          className={cn(
+            "mt-1 rounded-xl border px-3 py-2 text-xs leading-relaxed transition-colors",
+            isResetSuccess
+              ? "border-success/70 bg-success/15 text-success animate-in fade-in slide-in-from-top-1"
+              : "border-border bg-muted text-muted-foreground",
+          )}
+        >
+          {isResetSuccess
+            ? "Password updated successfully! Redirecting to login..."
+            : "After resetting, your account will be secured with your new password."}
+        </div>
+
+        {/* Submit Button */}
+        <Button
+          type="submit"
+          disabled={isSubmitting || isTokenInvalid || isResetSuccess}
+          className={cn(
+            "mt-1 flex h-12 w-full items-center justify-center gap-2 rounded-full text-base font-semibold transition-all",
+            (isSubmitting || isTokenInvalid || isResetSuccess) && "cursor-not-allowed opacity-70",
+          )}
+        >
+          {isResetSuccess ? (
+            // button is disabled, just show final state
+            "Redirecting…"
+          ) : isSubmitting ? (
+            <>
+              <Loader2 className="h-5 w-5 animate-spin" />
+              Updating password...
+            </>
+          ) : (
+            "Reset password"
+          )}
+        </Button>
+
+        {/* Divider */}
+        <div className="flex items-center gap-4 pt-4">
+          <span className="bg-border h-px w-full" />
+          <span className="text-muted-foreground text-[11px] tracking-[0.2em] uppercase">Back</span>
+          <span className="bg-border h-px w-full" />
+        </div>
+
+        <div className="text-center">
+          <Link
+            href="/login"
+            className="text-muted-foreground hover:text-foreground text-sm font-medium"
           >
-            {isSubmitting || isResetSuccess ? (
-              <>
-                <Loader2 className="h-4 w-4 animate-spin" />
-                <span>{isResetSuccess ? "Redirecting..." : "Resetting..."}</span>
-              </>
-            ) : (
-              <>Reset password</>
-            )}
-          </Button>
-
-          <div className="flex items-center gap-3 pt-2">
-            <span className="bg-foreground h-px flex-1" />
-            <span className="text-foreground text-[10px] tracking-[0.18em] uppercase">...</span>
-            <span className="bg-foreground h-px flex-1" />
-          </div>
-
-          <div className="text-center text-[10px]">
-            <Link
-              href="/login"
-              className="text-foreground/60 hover:text-foreground/90 text-xs font-medium"
-            >
-              Return to login
-            </Link>
-          </div>
+            Return to login
+          </Link>
         </div>
       </form>
     </div>

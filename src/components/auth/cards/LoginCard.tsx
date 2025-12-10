@@ -51,7 +51,6 @@ export function LoginCard() {
       clearFormMessage();
 
       await loginRequest(email, password);
-
       router.push("/");
     } catch (err: unknown) {
       const error = err as ApiError;
@@ -76,12 +75,7 @@ export function LoginCard() {
     >
       {/* Header */}
       <div className="flex flex-col items-center pt-10 pb-6">
-        <div
-          className={cn(
-            "ring-border flex h-14 w-14 items-center justify-center rounded-2xl text-lg shadow-sm ring-1",
-            "bg-muted text-foreground",
-          )}
-        >
+        <div className="bg-muted text-foreground ring-border flex h-14 w-14 items-center justify-center rounded-2xl text-lg shadow-sm ring-1">
           <LogIn className="h-6 w-6" />
         </div>
 
@@ -149,7 +143,6 @@ export function LoginCard() {
           </Link>
         </div>
 
-        {/* CTA Button */}
         <Button
           type="submit"
           disabled={isSubmitting}
@@ -168,7 +161,6 @@ export function LoginCard() {
           )}
         </Button>
 
-        {/* Divider */}
         <div className="flex items-center gap-4 pt-4">
           <span className="bg-border h-px w-full" />
           <span className="text-muted-foreground text-[11px] tracking-[0.2em] uppercase">Or</span>
