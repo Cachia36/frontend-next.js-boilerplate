@@ -22,8 +22,12 @@ jobs:
 
       - name: Load .env.test
         run: |
-          echo "Loading .env.test"
-          export $(egrep -v '^#' .env.test | xargs)
+          echo "Loading .env.test into environment..."
+          while IFS='=' read -r key value; do
+            if [[ ! "$key" =~ ^# && -n "$key" ]]; then
+              echo "$key=$value" >> $GITHUB_ENV
+            fi
+          done < .env.test
 
       - name: Run lint
         run: npm run lint
