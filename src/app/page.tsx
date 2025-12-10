@@ -59,7 +59,7 @@ export default function HomePage() {
 
           {/* GitHub link (dashed outline) */}
           <a
-            href="https://github.com/your-username/your-repo"
+            href="https://github.com/cachia36/next.js-boilerplate"
             target="_blank"
             rel="noreferrer"
             className="border-border text-muted-foreground hover:bg-muted inline-flex items-center justify-center rounded-full border border-dashed px-4 py-2 text-sm font-medium transition"
