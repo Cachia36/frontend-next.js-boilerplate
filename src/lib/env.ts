@@ -1,34 +1,38 @@
+import { error } from "console";
 import { z } from "zod";
 
-const envSchema = z.object({
+const baseSchema = z.object({
   NODE_ENV: z.enum(["development", "test", "production"]).default("development"),
 
-  // Required
-  JWT_SECRET: z.string().min(1, "JWT_SECRET is required"),
+  JWT_SECRET: z.string(),
+  JWT_REFRESH_SECRET: z.string().optional(),
 
-  // Optional at validation time
-  JWT_REFRESH_SECRET: z.string().min(1, "JWT_REFRESH_SECRET is required").optional(),
-
-  // Optional, but must be a valid URL if provided
   NEXT_PUBLIC_APP_URL: z.string().url().optional(),
-
-  // Fully optional
   EMAIL_API_KEY: z.string().optional(),
+
+  // Optional at first — validated later based on driver
+  MONGODB_URI: z.string().optional(),
+  MONGODB_DB_NAME: z.string().optional(),
+
+  PERSISTENCE_DRIVER: z.enum(["memory", "mongo"]).default("memory"),
 });
 
-const parsed = envSchema.safeParse({
+const isTest = process.env.NODE_ENV === "test";
+
+const parsed = baseSchema.safeParse({
   NODE_ENV: process.env.NODE_ENV,
-  JWT_SECRET: process.env.JWT_SECRET,
-
-  // IMPORTANT: do NOT fallback here
-  // Let it be undefined so Zod treats it as optional.
+  JWT_SECRET: 
+    process.env.JWT_SECRET ??
+    (isTest ? "test-secret" : undefined),
   JWT_REFRESH_SECRET: process.env.JWT_REFRESH_SECRET,
-
   NEXT_PUBLIC_APP_URL:
     process.env.NEXT_PUBLIC_APP_URL ||
     (process.env.NODE_ENV === "production" ? undefined : "http://localhost:3000"),
-
   EMAIL_API_KEY: process.env.EMAIL_API_KEY,
+
+  MONGODB_URI: process.env.MONGODB_URI,
+  MONGODB_DB_NAME: process.env.MONGODB_DB_NAME,
+  PERSISTENCE_DRIVER: process.env.PERSISTENCE_DRIVER,
 });
 
 if (!parsed.success) {
@@ -38,13 +42,25 @@ if (!parsed.success) {
 
 const env = parsed.data;
 
+if (env.PERSISTENCE_DRIVER === "mongo") {
+  if (!env.MONGODB_URI) {
+    throw new Error("MONGODB_URI is required when PERSISTENCE_DRIVER='mongo'");
+  }
+  if (!env.MONGODB_DB_NAME) {
+    throw new Error("MONGODB_DB_NAME is required when PERSISTENCE_DRIVER='mongo'");
+  }
+}
+
 export const NODE_ENV = env.NODE_ENV;
 export const JWT_SECRET = env.JWT_SECRET;
-
-// Fallback happens here, AFTER validation
 export const JWT_REFRESH_SECRET = env.JWT_REFRESH_SECRET ?? env.JWT_SECRET;
-
 export const APP_URL =
-  env.NEXT_PUBLIC_APP_URL ?? (NODE_ENV === "development" ? "http://localhost:3000" : "");
+  env.NEXT_PUBLIC_APP_URL ??
+  (NODE_ENV === "development" ? "http://localhost:3000" : "");
 
 export const EMAIL_API_KEY = env.EMAIL_API_KEY;
+
+export const PERSISTENCE_DRIVER = env.PERSISTENCE_DRIVER;
+
+export const MONGODB_URI = env.MONGODB_URI;
+export const MONGODB_DB_NAME = env.MONGODB_DB_NAME;

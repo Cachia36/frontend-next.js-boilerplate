@@ -53,7 +53,7 @@ vi.mock("crypto", () => {
 });
 
 // repo
-vi.mock("@/lib/auth/currentRepo", () => ({
+vi.mock("@/lib/auth/repositories/currentRepo", () => ({
   repo: {
     findByEmail: vi.fn(),
     setPasswordResetToken: vi.fn(),
@@ -69,6 +69,7 @@ vi.mock("@/lib/email/emailService", () => ({
 vi.mock("@/lib/env", () => ({
   APP_URL: "http://app.test",
   NODE_ENV: "development",
+  PERSISTENCE_DRIVER: "memory"
 }));
 
 // rate limiter
@@ -99,11 +100,12 @@ vi.mock("@/lib/withApiRoute", () => ({
 
 import { POST } from "./route";
 import crypto from "crypto";
-import { repo } from "@/lib/auth/currentRepo";
+import { repo } from "@/lib/auth/repositories/currentRepo";
 import { sendPasswordResetEmail } from "@/lib/email/emailService";
 import { checkRateLimit } from "@/lib/rateLimiter";
 import { logAuthEvent } from "@/lib/logger";
 import { emailSchema } from "@/lib/validation/authSchemas";
+import { PERSISTENCE_DRIVER } from "@/lib/env";
 
 const mockRandomBytes = crypto.randomBytes as unknown as ReturnType<typeof vi.fn>;
 const mockFindByEmail = repo.findByEmail as unknown as ReturnType<typeof vi.fn>;

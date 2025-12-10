@@ -1,6 +1,6 @@
 import type { User, DbUser } from "@/types/user";
 import { HttpError } from "../errors";
-import { repo } from "./currentRepo";
+import { repo } from "./repositories/currentRepo";
 import { hashPassword, verifyPassword } from "./passwordService";
 import { generateAccessToken, generateRefreshToken, verifyAccessToken } from "./jwtService";
 import type { AuthTokenPayload } from "@/types/auth";

@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import crypto from "crypto";
-import { repo } from "@/lib/auth/currentRepo";
+import { repo } from "@/lib/auth/repositories/currentRepo";
 import { sendPasswordResetEmail } from "@/lib/email/emailService";
 import { APP_URL, NODE_ENV } from "@/lib/env";
 import { checkRateLimit } from "@/lib/rateLimiter";

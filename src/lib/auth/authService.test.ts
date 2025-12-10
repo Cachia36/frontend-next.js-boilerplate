@@ -1,7 +1,6 @@
-// src/lib/auth/authService.test.ts
 import { describe, it, expect, vi, beforeEach } from "vitest";
 
-vi.mock("./currentRepo", () => ({
+vi.mock("./repositories/currentRepo", () => ({
   repo: {
     findByEmail: vi.fn(),
     createUser: vi.fn(),
@@ -27,7 +26,7 @@ vi.mock("../logger", () => ({
 
 import { authService } from "./authService";
 import { HttpError } from "../errors";
-import { repo } from "./currentRepo";
+import { repo } from "./repositories/currentRepo";
 import { hashPassword, verifyPassword } from "./passwordService";
 import { generateAccessToken, generateRefreshToken, verifyAccessToken } from "./jwtService";
 import { logAuthEvent } from "../logger";

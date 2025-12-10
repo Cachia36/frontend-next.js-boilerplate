@@ -2,6 +2,7 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { authService } from "@/lib/auth/authService";
 import type { User } from "@/types/user";
+import { FeatureCard } from "@/components/layout/FeatureCard";
 
 export default async function AdminDashboardPage() {
   // In server components, cookies() is synchronous
@@ -36,18 +37,22 @@ export default async function AdminDashboardPage() {
         This is an example of an admin-only route using role-based access control on top of
         authentication.
       </p>
-
-      <pre className="mt-4 rounded bg-slate-900 p-4 text-sm wrap-break-word whitespace-pre-wrap text-slate-100">
-        {JSON.stringify(
-          {
-            userId: user.id,
-            email: user.email,
-            role: user.role,
-          },
-          null,
-          2,
-        )}
-      </pre>
+      <p>Your account details, fetched from the accessToken inside the Cookies</p>
+      <div className="mt-4">
+        <FeatureCard title="">
+          <pre>
+            {JSON.stringify(
+              {
+                userId: user.id,
+                email: user.email,
+                role: user.role,
+              },
+              null,
+              2,
+            )}
+          </pre>
+        </FeatureCard>
+      </div>
     </main>
   );
 }

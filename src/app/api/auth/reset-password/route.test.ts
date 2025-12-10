@@ -48,7 +48,7 @@ vi.mock("@/lib/auth/authService", () => ({
 }));
 
 // repo
-vi.mock("@/lib/auth/currentRepo", () => ({
+vi.mock("@/lib/auth/repositories/currentRepo", () => ({
   repo: {
     findByPasswordResetToken: vi.fn(),
   },
@@ -77,7 +77,7 @@ vi.mock("@/lib/withApiRoute", () => ({
 
 import { POST } from "./route";
 import { authService } from "@/lib/auth/authService";
-import { repo } from "@/lib/auth/currentRepo";
+import { repo } from "@/lib/auth/repositories/currentRepo";
 import { passwordSchema } from "@/lib/validation/authSchemas";
 import { logAuthEvent } from "@/lib/logger";
 

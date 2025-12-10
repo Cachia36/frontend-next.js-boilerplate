@@ -38,21 +38,24 @@ export default async function DashboardPage() {
 
   return (
     <main className="p-8">
-
       <h1 className="text-2xl font-semibold">Dashboard</h1>
       <p className="mt-4">Protected page. You must be logged in to see this.</p>
-
-      <pre className="mt-4 rounded bg-slate-900 p-4 text-sm wrap-break-word whitespace-pre-wrap text-slate-100">
-        {JSON.stringify(
-          {
-            userId: user.id,
-            email: user.email,
-            role: user.role,
-          },
-          null,
-          2,
-        )}
-      </pre>
+      <p>Your account details, fetched from the accessToken inside the Cookies</p>
+      <div className="mt-4">
+        <FeatureCard title="">
+          <pre>
+            {JSON.stringify(
+              {
+                userId: user.id,
+                email: user.email,
+                role: user.role,
+              },
+              null,
+              2,
+            )}
+          </pre>
+        </FeatureCard>
+      </div>
     </main>
   );
 }

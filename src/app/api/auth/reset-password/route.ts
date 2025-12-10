@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { authService } from "@/lib/auth/authService";
-import { repo } from "@/lib/auth/currentRepo";
+import { repo } from "@/lib/auth/repositories/currentRepo";
 import { passwordSchema } from "@/lib/validation/authSchemas";
 import { HttpError } from "@/lib/errors";
 import { logAuthEvent } from "@/lib/logger";
