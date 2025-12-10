@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
@@ -28,13 +28,14 @@ export function MobileMenu({
   onLogout,
   currentPath,
 }: MobileMenuProps) {
-  // Portal target: computed lazily, SSR-safe
-  const [portalTarget] = useState<HTMLElement | null>(() =>
-    typeof window === "undefined" ? null : document.body,
-  );
+  const [portalTarget, setPortalTarget] = useState<HTMLElement | null>(null);
 
-  // During SSR and the very first client render, this will be null.
-  // That means "render nothing" on both server AND initial client render → no hydration mismatch.
+  // Only runs on the client, after hydration
+  useEffect(() => {
+    setPortalTarget(document.body);
+  }, []);
+
+  // SSR + first client paint: renders nothing → no hydration mismatch
   if (!portalTarget) {
     return null;
   }
@@ -54,10 +55,10 @@ export function MobileMenu({
           : "pointer-events-none invisible opacity-0",
       )}
     >
-      {/* Backdrop – covers entire viewport, clicking closes menu */}
+      {/* Backdrop */}
       <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={onClose} />
 
-      {/* Floating panel */}
+      {/* Panel */}
       <div
         className={cn(
           "border-border bg-background/95 absolute inset-x-0 top-3 mx-4 origin-top rounded-2xl border shadow-xl",
@@ -66,9 +67,7 @@ export function MobileMenu({
         )}
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Content */}
         <div className="flex flex-col gap-5 p-4">
-          {/* Auth actions */}
           <div className="flex justify-center">
             <AuthActions
               loading={authLoading}
@@ -82,7 +81,6 @@ export function MobileMenu({
             />
           </div>
 
-          {/* Nav links */}
           <nav className="flex flex-col gap-2 text-base font-medium">
             {navLinks.map((link) => {
               const active = isRouteActive(link.href);
