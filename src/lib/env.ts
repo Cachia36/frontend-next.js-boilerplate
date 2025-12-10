@@ -1,4 +1,3 @@
-import { error } from "console";
 import { z } from "zod";
 
 const baseSchema = z.object({
@@ -21,9 +20,7 @@ const isTest = process.env.NODE_ENV === "test";
 
 const parsed = baseSchema.safeParse({
   NODE_ENV: process.env.NODE_ENV,
-  JWT_SECRET: 
-    process.env.JWT_SECRET ??
-    (isTest ? "test-secret" : undefined),
+  JWT_SECRET: process.env.JWT_SECRET ?? (isTest ? "test-secret" : undefined),
   JWT_REFRESH_SECRET: process.env.JWT_REFRESH_SECRET,
   NEXT_PUBLIC_APP_URL:
     process.env.NEXT_PUBLIC_APP_URL ||
@@ -55,8 +52,7 @@ export const NODE_ENV = env.NODE_ENV;
 export const JWT_SECRET = env.JWT_SECRET;
 export const JWT_REFRESH_SECRET = env.JWT_REFRESH_SECRET ?? env.JWT_SECRET;
 export const APP_URL =
-  env.NEXT_PUBLIC_APP_URL ??
-  (NODE_ENV === "development" ? "http://localhost:3000" : "");
+  env.NEXT_PUBLIC_APP_URL ?? (NODE_ENV === "development" ? "http://localhost:3000" : "");
 
 export const EMAIL_API_KEY = env.EMAIL_API_KEY;
 

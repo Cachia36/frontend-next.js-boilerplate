@@ -14,9 +14,7 @@ export async function getDb(): Promise<Db> {
   const dbName = MONGODB_DB_NAME;
 
   if (!uri || !dbName) {
-    throw new Error(
-      "MONGODB_URI and MONGODB_DB_NAME must be set when PERSISTENCE_DRIVER='mongo'",
-    );
+    throw new Error("MONGODB_URI and MONGODB_DB_NAME must be set when PERSISTENCE_DRIVER='mongo'");
   }
 
   if (cachedDb && cachedClient) return cachedDb;

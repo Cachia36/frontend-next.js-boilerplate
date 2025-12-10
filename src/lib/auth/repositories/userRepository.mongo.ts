@@ -1,19 +1,33 @@
 import { ObjectId } from "mongodb";
-import type { DbUser } from "@/types/user";
+import type { DbUser, UserRole } from "@/types/user";
 import type { UserRepository, CreateUserInput } from "./userRepository";
 import { getDb } from "@/lib/db/mongoClient";
 import { HttpError } from "@/lib/errors";
 
+type UserDocument = {
+  _id?: ObjectId;
+  email: string;
+  role: UserRole;
+  passwordHash: string;
+  createdAt: Date;
+  passwordResetToken: string | null;
+  passwordResetExpiresAt: Date | null;
+};
+
 const COLLECTION = "users";
 
-function mapDocToDbUser(doc: any): DbUser {
+function mapDocToDbUser(doc: UserDocument): DbUser {
+  if (!doc._id) {
+    throw new Error("User document is missing _id");
+  }
+
   return {
     id: doc._id.toHexString(),
     email: doc.email,
     role: doc.role,
     passwordHash: doc.passwordHash,
     createdAt: doc.createdAt.toISOString(),
-    passwordResetToken: doc.passwordResetToken ?? null,
+    passwordResetToken: doc.passwordResetToken,
     passwordResetExpiresAt: doc.passwordResetExpiresAt
       ? doc.passwordResetExpiresAt.toISOString()
       : null,
@@ -25,13 +39,17 @@ export const mongoUserRepository: UserRepository = {
     const db = await getDb();
     const normalizedEmail = email.trim().toLowerCase();
 
-    const doc = await db.collection(COLLECTION).findOne({ email: normalizedEmail });
+    const col = db.collection<UserDocument>(COLLECTION);
+    const doc = await col.findOne({ email: normalizedEmail });
+
     return doc ? mapDocToDbUser(doc) : null;
   },
 
   async findById(id) {
     const db = await getDb();
-    const doc = await db.collection(COLLECTION).findOne({ _id: new ObjectId(id) });
+
+    const col = db.collection<UserDocument>(COLLECTION);
+    const doc = await col.findOne({ _id: new ObjectId(id) });
 
     return doc ? mapDocToDbUser(doc) : null;
   },
@@ -40,22 +58,26 @@ export const mongoUserRepository: UserRepository = {
     const db = await getDb();
     const normalizedEmail = data.email.trim().toLowerCase();
 
+    const col = db.collection<UserDocument>(COLLECTION);
+
     // same behaviour as memory repo
-    const existing = await db.collection(COLLECTION).findOne({ email: normalizedEmail });
+    const existing = await col.findOne({ email: normalizedEmail });
     if (existing) {
       throw new HttpError(409, "User already exists", "AUTH_EMAIL_ALREADY_EXISTS");
     }
 
     const now = new Date();
 
-    const result = await db.collection(COLLECTION).insertOne({
+    const newUserDoc: UserDocument = {
       email: normalizedEmail,
       role: data.role,
       passwordHash: data.passwordHash,
       createdAt: now,
       passwordResetToken: null,
       passwordResetExpiresAt: null,
-    });
+    };
+
+    const result = await col.insertOne(newUserDoc);
 
     return {
       id: result.insertedId.toHexString(),
@@ -100,7 +122,8 @@ export const mongoUserRepository: UserRepository = {
     const db = await getDb();
     const now = new Date();
 
-    const doc = await db.collection(COLLECTION).findOne({
+    const col = db.collection<UserDocument>(COLLECTION);
+    const doc = await col.findOne({
       passwordResetToken: token,
       passwordResetExpiresAt: { $gt: now },
     });
