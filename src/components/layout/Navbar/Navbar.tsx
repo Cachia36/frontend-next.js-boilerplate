@@ -93,12 +93,7 @@ export default function Navbar() {
     <nav className="bg-background/80 border-border supports-backdrop-filter:bg-background/60 sticky top-0 z-50 w-full border-b px-4 py-3 backdrop-blur">
       {/* MOBILE: top row */}
       <div className="flex items-center justify-between md:hidden">
-        <div className="flex flex-col">
-          <span className="text-muted-foreground text-[11px] font-semibold tracking-[0.18em] uppercase">
-            Auth Boilerplate
-          </span>
-          <span className="text-muted-foreground/80 text-[11px]">Next.js · TypeScript · JWT</span>
-        </div>
+        <div className="w-8" />
         <div className="flex flex-row gap-4">
           <ThemeToggle isDark={isDark} onToggle={toggleTheme} />
           <button

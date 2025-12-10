@@ -61,20 +61,8 @@ export function MobileMenu({
         )}
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Header / brand */}
-        <div className="flex items-center justify-between px-4 pt-4 pb-3">
-          <div className="flex flex-col">
-            <span className="text-muted-foreground text-[11px] font-semibold tracking-[0.18em] uppercase">
-              Auth Boilerplate
-            </span>
-            <span className="text-muted-foreground/80 text-[11px]">Next.js · TypeScript · JWT</span>
-          </div>
-
-          <span className="text-muted-foreground/70 text-[11px]">Menu</span>
-        </div>
-
         {/* Content */}
-        <div className="flex flex-col gap-5 px-4 pt-1 pb-4">
+        <div className="flex flex-col gap-5 p-4">
           {/* Auth actions */}
           <div className="flex justify-center">
             <AuthActions
@@ -111,13 +99,6 @@ export function MobileMenu({
               );
             })}
           </nav>
-
-          {/* Small footer hint */}
-          <div className="border-border/70 mt-1 border-t pt-3">
-            <p className="text-muted-foreground/80 text-[11px]">
-              Tap anywhere outside this panel to close the menu.
-            </p>
-          </div>
         </div>
       </div>
     </div>,

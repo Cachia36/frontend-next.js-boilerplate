@@ -36,17 +36,7 @@ export function DesktopNavbar({
   return (
     <div className="hidden items-center justify-between gap-6 md:flex">
       {/* Logo / brand */}
-      <Link href="/" className="flex items-center gap-2">
-        <div className="border-border bg-muted flex h-8 w-8 items-center justify-center rounded-xl border text-xs font-semibold">
-          KC
-        </div>
-        <div className="flex flex-col">
-          <span className="text-muted-foreground text-xs font-semibold tracking-[0.18em] uppercase">
-            Auth Boilerplate
-          </span>
-          <span className="text-muted-foreground/80 text-[11px]">Next.js · TypeScript · JWT</span>
-        </div>
-      </Link>
+      <div className="w-8" />
 
       {/* Center nav links */}
       <nav className="flex items-center gap-6 text-sm font-medium">
