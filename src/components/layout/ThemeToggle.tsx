@@ -10,35 +10,28 @@ export function ThemeToggle({ isDark, onToggle }: ThemeToggleProps) {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    // We intentionally set mounted here to avoid a hydration mismatch.
-    // eslint-disable-next-line react-hooks/set-state-in-effect
+    // Avoid hydration mismatch
     setMounted(true);
   }, []);
-
-  const checked = mounted ? isDark : false;
 
   return (
     <button
       type="button"
       onClick={onToggle}
-      role="switch"
-      aria-checked={checked}
-      className="flex items-center gap-2 focus:outline-none"
+      className={cn(
+        "border-border bg-muted/60 text-muted-foreground relative inline-flex h-8 w-14 items-center rounded-full border px-1 text-xs font-medium shadow-sm transition-colors",
+        mounted && isDark && "bg-foreground/90 text-primary-foreground",
+      )}
+      aria-label="Toggle theme"
     >
+      <span className="sr-only">Toggle theme</span>
+
       <span
         className={cn(
-          "relative inline-flex h-6 w-11 items-center rounded-full border transition-colors",
-          isDark ? "bg-foreground border-foreground" : "bg-foreground border-foreground",
+          "bg-background pointer-events-none inline-flex h-6 w-6 transform-gpu items-center justify-center rounded-full shadow transition-transform",
+          mounted && isDark ? "translate-x-6" : "translate-x-0",
         )}
-      >
-        <span
-          className={cn(
-            "bg-background inline-block h-5 w-5 transform-gpu rounded-full shadow transition-transform",
-            // Only move the thumb after we’re mounted to avoid SSR/client mismatch
-            mounted && isDark ? "translate-x-5" : "translate-x-1",
-          )}
-        />
-      </span>
+      />
     </button>
   );
 }

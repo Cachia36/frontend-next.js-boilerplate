@@ -93,7 +93,7 @@ export function ResetPasswordCard() {
         <div
           className={cn(
             "flex h-12 w-12 items-center justify-center rounded-2xl text-xl shadow-xl transition-all duration-300 ease-out",
-            isResetSuccess ? "bg-emerald-500/15 text-emerald-500" : "bg-foreground/15",
+            isResetSuccess ? "bg-success/15 text-success" : "bg-muted text-muted-foreground",
           )}
         >
           {isResetSuccess ? <CheckCircle2 className="h-5 w-5" /> : <KeyRound className="h-5 w-5" />}
@@ -113,8 +113,7 @@ export function ResetPasswordCard() {
       {/* Form */}
       <form onSubmit={handleSubmit} className="space-y-4 px-6 pt-2 pb-6" noValidate>
         <div className="space-y-3">
-          {formMessage && <p className="px-1 text-center text-xs text-red-500">{formMessage}</p>}
-
+          {formMessage && <p className="text-error px-1 text-center text-xs">{formMessage}</p>}
           <PasswordField
             value={password}
             error={fieldErrors.password}

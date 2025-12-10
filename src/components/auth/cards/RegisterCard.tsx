@@ -99,8 +99,7 @@ export function RegisterCard() {
       <form onSubmit={handleSubmit} className="space-y-4 px-6 pt-2 pb-6" noValidate>
         <div className="space-y-3">
           {/* Form-level message */}
-          {formMessage && <p className="px-1 text-center text-xs text-red-500">{formMessage}</p>}
-
+          {formMessage && <p className="text-error px-1 text-center text-xs">{formMessage}</p>}
           {/* Email */}
           <EmailField
             value={email}
@@ -212,18 +211,18 @@ export function RegisterCard() {
 
           {/* Divider */}
           <div className="flex items-center gap-3 pt-2">
-            <span className="bg-foreground h-px flex-1" />
-            <span className="text-foreground text-[10px] tracking-[0.18em] uppercase">
+            <span className="bg-border h-px flex-1" />
+            <span className="text-muted-foreground text-[10px] tracking-[0.18em] uppercase">
               Already have an account?
             </span>
-            <span className="bg-foreground h-px flex-1" />
+            <span className="bg-border h-px flex-1" />
           </div>
 
           {/* Bottom link */}
           <div className="text-center text-[10px]">
             <Link
               href="/login"
-              className="text-foreground/60 hover:text-foreground/90 text-xs font-medium"
+              className="text-muted-foreground hover:text-foreground text-xs font-medium"
             >
               Click here to log in
             </Link>

@@ -27,7 +27,6 @@ export function LoginCard() {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const [showPassword, setShowPassword] = useState(false);
-
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
@@ -56,8 +55,9 @@ export function LoginCard() {
       router.push("/");
     } catch (err: unknown) {
       const error = err as ApiError;
+
       if (error.statusCode === 429) {
-        setFormMessage("Too many attempts. Please wait a minute and try again.");
+        setFormMessage("Too many attempts. Please wait and try again.");
       } else {
         setFormMessage(error.message ?? "Failed to sign in");
       }
@@ -69,138 +69,119 @@ export function LoginCard() {
   return (
     <div
       className={cn(
-        "w-full max-w-sm overflow-hidden rounded-3xl border shadow-xl",
+        "border-border bg-background/90 w-full max-w-md rounded-3xl border shadow-lg",
         "transition-all duration-300 ease-out",
-        "hover:border-foreground/50 hover:-translate-y-[2px] hover:shadow-2xl",
+        "hover:border-foreground/20 hover:shadow-xl",
       )}
     >
       {/* Header */}
-      <div className="flex flex-col items-center pt-8 pb-4">
+      <div className="flex flex-col items-center pt-10 pb-6">
         <div
           className={cn(
-            "flex h-12 w-12 items-center justify-center rounded-2xl text-xl shadow-xl transition-all duration-300 ease-out",
-            "bg-foreground/15",
+            "ring-border flex h-14 w-14 items-center justify-center rounded-2xl text-lg shadow-sm ring-1",
+            "bg-muted text-foreground",
           )}
         >
-          <LogIn className="h-5 w-5" />
+          <LogIn className="h-6 w-6" />
         </div>
 
-        <h2 className="mt-4 text-lg font-semibold">Welcome back</h2>
+        <h2 className="mt-5 text-2xl font-semibold tracking-tight">Welcome back</h2>
 
-        <p className="text-foreground/80 mt-1 px-10 text-center text-xs">
-          Sign in with your account to access your dashboard and continue where you left off
+        <p className="text-muted-foreground mt-2 max-w-[300px] px-4 text-center text-sm leading-relaxed">
+          Sign in to access your dashboard and continue where you left off.
         </p>
       </div>
 
       {/* Form */}
-      <form onSubmit={handleSubmit} className="space-y-4 px-6 pt-2 pb-6" noValidate>
-        <div className="space-y-3">
-          {/* Form-level message */}
-          {formMessage && <p className="px-1 text-center text-xs text-red-500">{formMessage}</p>}
+      <form onSubmit={handleSubmit} className="space-y-5 px-8 pb-10" noValidate>
+        {formMessage && <p className="text-error px-1 text-center text-sm">{formMessage}</p>}
 
-          {/* Email */}
-          <EmailField
-            value={email}
-            error={fieldErrors.email}
-            onChange={(value) => {
-              setEmail(value);
+        <EmailField
+          value={email}
+          error={fieldErrors.email}
+          onChange={(value) => {
+            setEmail(value);
 
-              if (fieldErrors.email) {
-                setFieldErrors((prev) => ({
-                  ...prev,
-                  email: validateEmail(value),
-                }));
-              }
-
-              if (formMessage) {
-                clearFormMessage();
-              }
-            }}
-            onBlur={(value) => {
-              const err = validateEmail(value);
+            if (fieldErrors.email) {
               setFieldErrors((prev) => ({
                 ...prev,
-                email: err,
+                email: validateEmail(value),
               }));
-            }}
-          />
+            }
 
-          {/* Password */}
-          <PasswordField
-            value={password}
-            error={fieldErrors.password}
-            placeholder="Password"
-            show={showPassword}
-            onChange={(value) => {
-              setPassword(value);
+            if (formMessage) clearFormMessage();
+          }}
+          onBlur={(value) => {
+            const err = validateEmail(value);
+            setFieldErrors((prev) => ({ ...prev, email: err }));
+          }}
+        />
 
-              if (fieldErrors.password) {
-                setFieldErrors((prev) => ({
-                  ...prev,
-                  password: validatePassword(value),
-                }));
-              }
-
-              if (formMessage) {
-                clearFormMessage();
-              }
-            }}
-            onBlur={(value) => {
-              const err = validatePassword(value);
+        <PasswordField
+          value={password}
+          error={fieldErrors.password}
+          placeholder="Password"
+          show={showPassword}
+          onChange={(value) => {
+            setPassword(value);
+            if (fieldErrors.password) {
               setFieldErrors((prev) => ({
                 ...prev,
-                password: err,
+                password: validatePassword(value),
               }));
-            }}
-            onToggleShow={() => setShowPassword((prev) => !prev)}
-            errorId="password-error"
-          />
+            }
+            if (formMessage) clearFormMessage();
+          }}
+          onBlur={(value) => {
+            const err = validatePassword(value);
+            setFieldErrors((prev) => ({ ...prev, password: err }));
+          }}
+          onToggleShow={() => setShowPassword((prev) => !prev)}
+          errorId="password-error"
+        />
 
-          {/* Forgot password link */}
-          <div className="flex justify-end">
-            <Link href="/forgot-password" className="hover:text-foreground/60 text-xs font-medium">
-              Forgot password?
-            </Link>
-          </div>
-
-          {/* Primary button */}
-          <Button
-            type="submit"
-            disabled={isSubmitting}
-            className={cn(
-              "flex w-full items-center justify-center gap-2 py-2.5 font-semibold transition",
-              "hover:bg-foreground/80",
-              isSubmitting && "hover:bg-foreground cursor-not-allowed opacity-70",
-            )}
+        <div className="-mt-2 flex justify-end">
+          <Link
+            href="/forgot-password"
+            className="text-muted-foreground hover:text-foreground text-sm font-medium"
           >
-            {isSubmitting ? (
-              <>
-                <Loader2 className="h-4 w-4 animate-spin" />
-                <span>Signing in...</span>
-              </>
-            ) : (
-              <>Get Started</>
-            )}
-          </Button>
+            Forgot password?
+          </Link>
+        </div>
 
-          {/* Divider */}
-          <div className="flex items-center gap-3 pt-2">
-            <span className="bg-foreground h-px flex-1" />
-            <span className="text-foreground text-[10px] tracking-[0.18em] uppercase">
-              Don&apos;t have an account?
-            </span>
-            <span className="bg-foreground h-px flex-1" />
-          </div>
+        {/* CTA Button */}
+        <Button
+          type="submit"
+          disabled={isSubmitting}
+          className={cn(
+            "mt-1 flex h-12 w-full items-center justify-center gap-2 rounded-full text-base font-semibold",
+            isSubmitting && "cursor-not-allowed opacity-70",
+          )}
+        >
+          {isSubmitting ? (
+            <>
+              <Loader2 className="h-5 w-5 animate-spin" />
+              Signing in...
+            </>
+          ) : (
+            "Sign in"
+          )}
+        </Button>
 
-          {/* Bottom link */}
-          <div className="text-center text-[10px]">
-            <Link
-              href="/register"
-              className="text-foreground/60 hover:text-foreground/90 text-xs font-medium"
-            >
-              Click here to register
-            </Link>
-          </div>
+        {/* Divider */}
+        <div className="flex items-center gap-4 pt-4">
+          <span className="bg-border h-px w-full" />
+          <span className="text-muted-foreground text-[11px] tracking-[0.2em] uppercase">Or</span>
+          <span className="bg-border h-px w-full" />
+        </div>
+
+        <div className="text-center">
+          <Link
+            href="/register"
+            className="text-muted-foreground hover:text-foreground text-sm font-medium"
+          >
+            Create a new account
+          </Link>
         </div>
       </form>
     </div>

@@ -1,11 +1,10 @@
-"use client";
-
+import { AuthPageShell } from "@/components/layout/AuthPageShell";
 import { LoginCard } from "@/components/auth/cards/LoginCard";
 
 export default function LoginPage() {
   return (
-    <div className="animate-in fade-in slide-in-from-bottom-4 flex flex-1 items-center justify-center p-4 duration-300">
+    <AuthPageShell>
       <LoginCard />
-    </div>
+    </AuthPageShell>
   );
 }

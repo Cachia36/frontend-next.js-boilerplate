@@ -67,7 +67,7 @@ export function ForgotPasswordCard() {
         <div
           className={cn(
             "flex h-12 w-12 items-center justify-center rounded-2xl text-xl shadow-xl transition-all duration-300 ease-out",
-            showSuccess ? "bg-emerald-500/15 text-emerald-500" : "bg-foreground/15",
+            showSuccess ? "bg-success/15 text-success" : "bg-muted text-muted-foreground",
           )}
         >
           {showSuccess ? <MailCheck className="h-5 w-5" /> : <KeyRound className="h-5 w-5" />}
@@ -88,8 +88,7 @@ export function ForgotPasswordCard() {
       <form onSubmit={handleSubmit} className="space-y-4 px-6 pt-2 pb-6" noValidate>
         <div className="space-y-3">
           {/* Form-level message */}
-          {formMessage && <p className="px-1 text-center text-xs text-red-500">{formMessage}</p>}
-
+          {formMessage && <p className="text-error px-1 text-center text-xs">{formMessage}</p>}
           {/* Email */}
           <EmailField
             value={email}
@@ -143,16 +142,18 @@ export function ForgotPasswordCard() {
 
           {/* Divider */}
           <div className="flex items-center gap-3 pt-2">
-            <span className="bg-foreground h-px flex-1" />
-            <span className="text-foreground text-[10px] tracking-[0.18em] uppercase">...</span>
-            <span className="bg-foreground h-px flex-1" />
+            <span className="bg-border h-px flex-1" />
+            <span className="text-muted-foreground text-[10px] tracking-[0.18em] uppercase">
+              ...
+            </span>
+            <span className="bg-border h-px flex-1" />
           </div>
 
           {/* Bottom link */}
           <div className="text-center text-[10px]">
             <Link
               href="/login"
-              className="text-foreground/60 hover:text-foreground/90 text-xs font-medium"
+              className="text-muted-foreground hover:text-foreground text-xs font-medium"
             >
               Return to login
             </Link>

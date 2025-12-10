@@ -1,5 +1,11 @@
+// app/page.tsx
 import Link from "next/link";
 import type { Metadata } from "next";
+import { PageShell } from "@/components/layout/page-shell";
+import { Section } from "@/components/layout/section";
+import { PageHeader } from "@/components/layout/page-header";
+import { FeatureCard } from "@/components/layout/FeatureCard";
+import { Pill } from "@/components/layout/pill";
 
 export const metadata: Metadata = {
   title: "Next.js Auth Boilerplate",
@@ -7,120 +13,108 @@ export const metadata: Metadata = {
     "A production-leaning authentication boilerplate built with Next.js, TypeScript, JWT, and Tailwind CSS.",
 };
 
+const techStackItems = [
+  "Next.js (App Router)",
+  "TypeScript",
+  "Tailwind CSS",
+  "JWT (access + refresh)",
+  "Zod",
+  "Vitest",
+  "ESLint (flat config)",
+  "Prettier",
+];
+
 export default function HomePage() {
   return (
-    <main className="container mx-auto max-w-5xl px-6 py-16">
+    <PageShell>
       {/* Hero */}
-      <section className="space-y-6">
-        <p className="text-muted-foreground text-sm font-medium tracking-[0.2em] uppercase">
-          Portfolio Project · Authentication Boilerplate
-        </p>
-
-        <h1 className="text-4xl font-bold tracking-tight sm:text-5xl">
-          Next.js Authentication Boilerplate
-        </h1>
-
-        <p className="text-muted-foreground max-w-2xl text-lg leading-relaxed">
-          A production-leaning starter kit that showcases how I design and implement authentication,
-          API routes, testing, and modern frontend architecture with Next.js, TypeScript, and
-          Tailwind CSS.
-        </p>
+      <Section mt="none">
+        <PageHeader
+          eyebrow="Portfolio Project · Authentication Boilerplate"
+          title="Next.js Authentication Boilerplate"
+          subtitle={
+            <>
+              A production-leaning starter kit that showcases how I design and implement
+              authentication, API routes, testing, and modern frontend architecture with Next.js,
+              TypeScript, and Tailwind CSS.
+            </>
+          }
+        />
 
         <div className="flex flex-wrap gap-3 pt-2">
+          {/* Primary CTA */}
           <Link
             href="/dashboard"
-            className="bg-primary text-primary-foreground inline-flex items-center justify-center rounded-md border border-transparent px-4 py-2 text-sm font-medium shadow-sm transition hover:opacity-90"
+            className="bg-foreground text-background inline-flex items-center justify-center rounded-full border px-4 py-2 text-sm font-medium shadow-sm transition hover:opacity-90"
           >
             Open Demo Dashboard
           </Link>
 
+          {/* Secondary CTA */}
           <Link
             href="/about"
-            className="border-border bg-background text-foreground hover:bg-muted inline-flex items-center justify-center rounded-md border px-4 py-2 text-sm font-medium"
+            className="border-border text-foreground hover:bg-muted inline-flex items-center justify-center rounded-full border bg-transparent px-4 py-2 text-sm font-medium transition"
           >
             Read About the Architecture
           </Link>
 
-          {/* Replace href with your actual GitHub repo */}
+          {/* GitHub link (dashed outline) */}
           <a
             href="https://github.com/your-username/your-repo"
             target="_blank"
             rel="noreferrer"
-            className="border-border text-muted-foreground hover:bg-muted inline-flex items-center justify-center rounded-md border border-dashed px-4 py-2 text-sm font-medium"
+            className="border-border text-muted-foreground hover:bg-muted inline-flex items-center justify-center rounded-full border border-dashed px-4 py-2 text-sm font-medium transition"
           >
             View Source on GitHub
           </a>
         </div>
-      </section>
+      </Section>
 
       {/* Key value props */}
-      <section className="mt-16 grid gap-8 md:grid-cols-3">
-        <div className="bg-card rounded-xl border p-6 shadow-sm">
-          <h2 className="text-base font-semibold">Real-world Auth</h2>
-          <p className="text-muted-foreground mt-2 text-sm">
-            Email + password login, JWT access and refresh tokens, HttpOnly cookies, protected
-            routes, and password reset flow wired end to end.
-          </p>
-        </div>
+      <Section className="grid gap-8 md:grid-cols-3">
+        <FeatureCard title="Real-world Auth">
+          Email + password login, JWT access and refresh tokens, HttpOnly cookies, protected routes,
+          and password reset flow wired end to end.
+        </FeatureCard>
 
-        <div className="bg-card rounded-xl border p-6 shadow-sm">
-          <h2 className="text-base font-semibold">Clean Architecture</h2>
-          <p className="text-muted-foreground mt-2 text-sm">
-            Separation between UI, services, domain logic, and infrastructure: repositories, email
-            providers, rate limiting, and env handling.
-          </p>
-        </div>
+        <FeatureCard title="Clean Architecture">
+          Separation between UI, services, domain logic, and infrastructure: repositories, email
+          providers, rate limiting, and environment handling.
+        </FeatureCard>
 
-        <div className="bg-card rounded-xl border p-6 shadow-sm">
-          <h2 className="text-base font-semibold">Tested & CI Ready</h2>
-          <p className="text-muted-foreground mt-2 text-sm">
-            Vitest unit tests for core modules and a GitHub Actions workflow that runs the test
-            suite on every push and pull request.
-          </p>
-        </div>
-      </section>
+        <FeatureCard title="Tested &amp; CI Ready">
+          Vitest unit tests for core modules and a GitHub Actions workflow that runs the test suite
+          on every push and pull request.
+        </FeatureCard>
+      </Section>
 
       {/* Tech stack */}
-      <section className="mt-16 space-y-4">
+      <Section>
         <h2 className="text-2xl font-semibold">Tech Stack</h2>
         <p className="text-muted-foreground text-sm">
           Built with a modern, production-oriented stack:
         </p>
 
         <div className="flex flex-wrap gap-2">
-          {[
-            "Next.js (App Router)",
-            "TypeScript",
-            "Tailwind CSS",
-            "JWT (access + refresh)",
-            "Zod",
-            "Vitest",
-            "ESLint (flat config)",
-            "Prettier",
-          ].map((item) => (
-            <span
-              key={item}
-              className="bg-muted text-muted-foreground rounded-full border px-3 py-1 text-xs font-medium"
-            >
-              {item}
-            </span>
+          {techStackItems.map((item) => (
+            <Pill key={item}>{item}</Pill>
           ))}
         </div>
-      </section>
+      </Section>
 
       {/* Architecture preview */}
-      <section className="mt-16 space-y-4">
+      <Section>
         <h2 className="text-2xl font-semibold">Architecture at a Glance</h2>
         <p className="text-muted-foreground text-sm">
           The project is structured to be easy to extend into a real product:
         </p>
 
         <div className="grid gap-4 md:grid-cols-2">
-          <div className="bg-card text-muted-foreground rounded-xl border p-5 text-sm">
-            <h3 className="text-foreground mb-2 text-sm font-semibold">Auth & Domain</h3>
+          <div className="bg-muted text-muted-foreground rounded-xl border p-5 text-sm">
+            <h3 className="text-foreground mb-2 text-sm font-semibold">Auth &amp; Domain</h3>
             <ul className="list-disc space-y-1 pl-4">
               <li>
-                <code className="bg-muted rounded px-1 py-0.5 text-[11px]">src/lib/auth</code> –
+                <code className="bg-muted rounded px-1 py-0.5 text-[11px]">src/lib/auth</code> –{" "}
                 auth service, JWT handling, password hashing
               </li>
               <li>
@@ -131,8 +125,8 @@ export default function HomePage() {
             </ul>
           </div>
 
-          <div className="bg-card text-muted-foreground rounded-xl border p-5 text-sm">
-            <h3 className="text-foreground mb-2 text-sm font-semibold">API & Middleware</h3>
+          <div className="bg-muted text-muted-foreground rounded-xl border p-5 text-sm">
+            <h3 className="text-foreground mb-2 text-sm font-semibold">API &amp; Middleware</h3>
             <ul className="list-disc space-y-1 pl-4">
               <li>REST-style route handlers under `/api/auth/*`</li>
               <li>Shared error handler and rate limiter for consistent responses</li>
@@ -151,10 +145,10 @@ export default function HomePage() {
           </Link>
           .
         </p>
-      </section>
+      </Section>
 
       {/* How to explore */}
-      <section className="mt-16 mb-8 space-y-4">
+      <Section className="mb-8">
         <h2 className="text-2xl font-semibold">How to Explore This Demo</h2>
 
         <ol className="text-muted-foreground list-decimal space-y-2 pl-5 text-sm">
@@ -175,7 +169,32 @@ export default function HomePage() {
             the email provider.
           </li>
         </ol>
-      </section>
-    </main>
+      </Section>
+
+      {/* Navbar anchor target: Services */}
+      <Section id="services">
+        <h2 className="text-2xl font-semibold">Services / Use Cases</h2>
+        <p className="text-muted-foreground text-sm leading-relaxed sm:text-base">
+          This boilerplate is designed as a starting point for SaaS dashboards, admin panels,
+          internal tools, or any application that needs solid authentication, role-based access
+          control, and a clean architecture you can confidently extend.
+        </p>
+      </Section>
+
+      {/* Navbar anchor target: Contact */}
+      <Section id="contact" className="mb-4">
+        <h2 className="text-2xl font-semibold">Contact</h2>
+        <p className="text-muted-foreground text-sm leading-relaxed sm:text-base">
+          Want to work together or see more of my work? Feel free to reach out via{" "}
+          <a
+            href="mailto:kylecachia2@gmail.com"
+            className="text-primary font-medium underline-offset-4 hover:underline"
+          >
+            email
+          </a>{" "}
+          or connect through the links in the footer.
+        </p>
+      </Section>
+    </PageShell>
   );
 }

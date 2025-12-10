@@ -1,4 +1,7 @@
 import type { Metadata } from "next";
+import { PageShell } from "@/components/layout/page-shell";
+import { Section } from "@/components/layout/section";
+import { PageHeader } from "@/components/layout/page-header";
 
 export const metadata: Metadata = {
   title: "About | Next.js Auth Boilerplate",
@@ -8,19 +11,23 @@ export const metadata: Metadata = {
 
 export default function AboutPage() {
   return (
-    <main className="container mx-auto max-w-5xl px-6 py-16">
+    <PageShell>
       {/* Intro */}
-      <section className="space-y-4">
-        <h1 className="text-4xl font-bold tracking-tight">Architecture & Design</h1>
-        <p className="text-muted-foreground text-lg leading-relaxed">
-          This page provides a technical overview of how the boilerplate is structured under the
-          hood: architecture, authentication flow, security measures, testing setup, and the
-          trade-offs made to keep it focused and easy to extend.
-        </p>
-      </section>
+      <Section mt="none">
+        <PageHeader
+          title="Architecture & Design"
+          subtitle={
+            <>
+              This page provides a technical overview of how the boilerplate is structured under the
+              hood: architecture, authentication flow, security measures, testing setup, and the
+              trade-offs made to keep it focused and easy to extend.
+            </>
+          }
+        />
+      </Section>
 
-      {/* Architecture */}
-      <section className="mt-16 space-y-6">
+      {/* High-Level Architecture */}
+      <Section>
         <h2 className="text-2xl font-semibold">High-Level Architecture</h2>
 
         <p className="text-muted-foreground leading-relaxed">
@@ -32,7 +39,7 @@ export default function AboutPage() {
           <li>
             <strong>UI Layer</strong> – pages, layouts, and presentational components in{" "}
             <code className="bg-muted rounded px-1 py-0.5 text-xs">src/app</code> and{" "}
-            <code className="bg-muted rounded px-1 py-0.5 text-xs">src/components</code>
+            <code className="bg-muted rounded px-1 py-0.5 text-xs">src/components</code>.
           </li>
           <li>
             <strong>Application Layer</strong> – route handlers and feature-specific services (e.g.
@@ -57,10 +64,10 @@ export default function AboutPage() {
           the current in-memory implementation can be swapped for a database-backed one without
           changing the rest of the codebase.
         </p>
-      </section>
+      </Section>
 
-      {/* Auth flow */}
-      <section className="mt-16 space-y-6">
+      {/* Authentication Flow */}
+      <Section>
         <h2 className="text-2xl font-semibold">Authentication Flow</h2>
 
         <p className="text-muted-foreground leading-relaxed">
@@ -96,10 +103,10 @@ export default function AboutPage() {
           All token creation, verification, and cookie management is handled in the auth service and
           JWT helpers so the API route handlers stay thin and focused on HTTP concerns.
         </p>
-      </section>
+      </Section>
 
-      {/* Middleware & routing */}
-      <section className="mt-16 space-y-6">
+      {/* Routing & Middleware */}
+      <Section>
         <h2 className="text-2xl font-semibold">Routing & Middleware</h2>
 
         <p className="text-muted-foreground leading-relaxed">
@@ -127,10 +134,10 @@ export default function AboutPage() {
             making it easier to extend into API clients later.
           </li>
         </ul>
-      </section>
+      </Section>
 
       {/* Security */}
-      <section className="mt-16 space-y-6">
+      <Section>
         <h2 className="text-2xl font-semibold">Security Considerations</h2>
 
         <ul className="text-muted-foreground list-disc space-y-2 pl-6">
@@ -159,10 +166,10 @@ export default function AboutPage() {
           abstractions are designed so that a Redis-backed rate limiter or database-backed user
           store can be introduced with minimal changes.
         </p>
-      </section>
+      </Section>
 
       {/* Testing & CI */}
-      <section className="mt-16 space-y-6">
+      <Section>
         <h2 className="text-2xl font-semibold">Testing & CI</h2>
 
         <p className="text-muted-foreground leading-relaxed">
@@ -182,10 +189,10 @@ export default function AboutPage() {
           20, providing fast feedback and ensuring the core behaviour stays correct as the project
           evolves.
         </p>
-      </section>
+      </Section>
 
       {/* Limitations & future work */}
-      <section className="mt-16 space-y-6">
+      <Section>
         <h2 className="text-2xl font-semibold">Limitations & Next Steps</h2>
 
         <p className="text-muted-foreground leading-relaxed">
@@ -206,17 +213,17 @@ export default function AboutPage() {
           Drizzle), a Redis-backed rate limiter, and an external email provider such as Resend or
           Postmark. The existing abstractions are designed to make those upgrades straightforward.
         </p>
-      </section>
+      </Section>
 
       {/* Closing */}
-      <section className="mt-20 space-y-4 border-t pt-12">
+      <Section className="mt-20 border-t pt-12">
         <h2 className="text-2xl font-semibold">Goal of This Boilerplate</h2>
         <p className="text-muted-foreground leading-relaxed">
           The goal of this boilerplate is to act as a solid starting point for real-world products
           while also showcasing how I think about clean architecture, security, and developer
           experience in a modern Next.js codebase.
         </p>
-      </section>
-    </main>
+      </Section>
+    </PageShell>
   );
 }
