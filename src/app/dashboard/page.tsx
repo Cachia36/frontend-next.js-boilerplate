@@ -1,6 +1,7 @@
 import { cookies } from "next/headers";
 import { authService } from "@/lib/auth/authService";
 import type { User } from "@/types/user";
+import { FeatureCard } from "@/components/layout/FeatureCard";
 
 export default async function DashboardPage() {
   const cookieStore = await cookies();
@@ -37,6 +38,7 @@ export default async function DashboardPage() {
 
   return (
     <main className="p-8">
+
       <h1 className="text-2xl font-semibold">Dashboard</h1>
       <p className="mt-4">Protected page. You must be logged in to see this.</p>
 

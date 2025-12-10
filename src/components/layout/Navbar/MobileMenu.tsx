@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
@@ -27,12 +28,19 @@ export function MobileMenu({
   onLogout,
   currentPath,
 }: MobileMenuProps) {
-  // Avoid using document on the server
-  if (typeof document === "undefined") {
+  // Keep track of whether we're mounted on the client
+  const [portalTarget, setPortalTarget] = useState<HTMLElement | null>(null);
+
+  useEffect(() => {
+    // This only runs on the client, after hydration
+    setPortalTarget(document.body);
+  }, []);
+
+  // During SSR and the very first client render, this will be null.
+  // That means "render nothing" on both server AND initial client render → no hydration mismatch.
+  if (!portalTarget) {
     return null;
   }
-
-  const portalTarget = document.body;
 
   const isRouteActive = (href: string) => {
     if (href.startsWith("#")) return false;
