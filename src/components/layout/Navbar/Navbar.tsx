@@ -12,7 +12,13 @@ import { DesktopNavbar } from "./DesktopNavbar";
 
 export default function Navbar() {
   const { toggleTheme, effectiveTheme } = useTheme();
-  const isDark = effectiveTheme === "dark";
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const isDark = mounted ? effectiveTheme === "dark" : false;
 
   const [isOpen, setIsOpen] = useState(false);
   const [authLoading, setAuthLoading] = useState(true);
