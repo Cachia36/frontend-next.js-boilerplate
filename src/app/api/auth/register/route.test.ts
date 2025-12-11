@@ -77,9 +77,9 @@ vi.mock("@/lib/withApiRoute", () => ({
 // ----------------------
 
 import { POST } from "./route";
-import { authService } from "@/lib/auth/authService";
-import { emailSchema, passwordSchema } from "@/lib/validation/authSchemas";
-import { logAuthEvent } from "@/lib/logger";
+import { authService } from "@/lib/auth/domain/authService";
+import { emailSchema, passwordSchema } from "@/lib/auth/validation/authSchemas";
+import { logAuthEvent } from "@/lib/core/logger";
 
 const mockRegister = (authService as any).register as ReturnType<typeof vi.fn>;
 const mockEmailParse = (emailSchema as any).parse as ReturnType<typeof vi.fn>;

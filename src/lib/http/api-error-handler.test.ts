@@ -51,8 +51,8 @@ vi.mock("./errors", () => {
 
 import { NextResponse } from "next/server";
 import { handleApiError } from "./api-error-handler";
-import { HttpError, toApiError } from "./errors";
-import { logError, logWarn } from "./logger";
+import { HttpError, toApiError } from "../core/errors";
+import { logError, logWarn } from "../core/logger";
 
 const mockJson = (NextResponse as any).json as ReturnType<typeof vi.fn>;
 const mockToApiError = toApiError as unknown as ReturnType<typeof vi.fn>;

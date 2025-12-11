@@ -1,6 +1,6 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-import { authService } from "@/lib/auth/authService";
+import { authService } from "@/lib/auth/domain/authService";
 import type { User } from "@/types/user";
 import { FeatureCard } from "@/components/layout/FeatureCard";
 

@@ -6,7 +6,7 @@ import Footer from "@/components/layout/Footer";
 import Script from "next/script";
 import { cookies } from "next/headers";
 import type { ReactNode } from "react";
-import { authService } from "@/lib/auth/authService";
+import { authService } from "@/lib/auth/domain/authService";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",

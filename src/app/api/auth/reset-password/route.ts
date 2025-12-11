@@ -1,12 +1,12 @@
 import { NextResponse } from "next/server";
-import { authService } from "@/lib/auth/authService";
+import { authService } from "@/lib/auth/domain/authService";
 import { repo } from "@/lib/auth/repositories/currentRepo";
-import { passwordSchema } from "@/lib/validation/authSchemas";
-import { NotFound, TooManyRequests } from "@/lib/errors";
-import { logAuthEvent } from "@/lib/logger";
-import { withApiRoute } from "@/lib/withApiRoute";
-import { checkRateLimit } from "@/lib/rateLimiter";
-import { BadRequest } from "@/lib/errors";
+import { passwordSchema } from "@/lib/auth/validation/authSchemas";
+import { NotFound, TooManyRequests } from "@/lib/core/errors";
+import { logAuthEvent } from "@/lib/core/logger";
+import { withApiRoute } from "@/lib/http/withApiRoute";
+import { checkRateLimit } from "@/lib/http/rateLimiter";
+import { BadRequest } from "@/lib/core/errors";
 
 const handler = async (req: Request): Promise<Response> => {
   const ip = req.headers.get("x-forwarded-for") ?? req.headers.get("x-real-ip") ?? "unknown";

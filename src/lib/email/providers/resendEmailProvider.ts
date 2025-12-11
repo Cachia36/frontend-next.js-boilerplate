@@ -1,6 +1,6 @@
 import { Resend } from "resend";
 import type { EmailProvider } from "../emailProvider";
-import { RESEND_API_KEY } from "@/lib/env";
+import { RESEND_API_KEY } from "@/lib/core/env";
 
 const resend = new Resend(RESEND_API_KEY!);
 

@@ -1,4 +1,4 @@
-import type { AuthResult } from "./authService";
+import type { AuthResult } from "../domain/authService";
 import type { User } from "@/types/user";
 
 type ApiError = Error & {

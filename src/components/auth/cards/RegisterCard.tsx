@@ -6,11 +6,15 @@ import Link from "next/link";
 import { UserPlus2, Loader2 } from "lucide-react";
 
 import { Button } from "@/components/ui/Button";
-import { cn } from "@/lib/utils";
-import { validateEmail, validatePassword, validateConfirmPassword } from "@/lib/validation/auth";
+import { cn } from "@/lib/core/utils";
+import {
+  validateEmail,
+  validatePassword,
+  validateConfirmPassword,
+} from "@/lib/auth/validation/auth";
 import { EmailField } from "../fields/EmailField";
 import { PasswordField } from "../fields/PasswordField";
-import { registerRequest } from "@/lib/auth/authClient";
+import { registerRequest } from "@/lib/auth/client/authClient";
 
 type FieldErrors = {
   name?: string;

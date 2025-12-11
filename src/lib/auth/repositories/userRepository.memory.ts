@@ -1,7 +1,7 @@
 import crypto from "crypto";
 import { DbUser } from "@/types/user";
 import { UserRepository, CreateUserInput } from "./userRepository";
-import { Conflict, NotFound } from "../../errors";
+import { Conflict, NotFound } from "../../core/errors";
 
 const globalForUsers = globalThis as unknown as {
   __memoryUsers?: DbUser[];

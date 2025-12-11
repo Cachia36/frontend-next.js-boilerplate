@@ -1,5 +1,5 @@
 import type { EmailProvider } from "../emailProvider";
-import { logInfo } from "@/lib/logger";
+import { logInfo } from "@/lib/core/logger";
 
 //No email is sent, instead it is logged, for testing
 export const consoleEmailProvider: EmailProvider = {

@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import Link from "next/link";
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/core/utils";
 import { AuthActions } from "@/components/auth/AuthActions";
 import type { NavLink } from "./NavLinks";
 

@@ -5,10 +5,10 @@ import Link from "next/link";
 import { MailQuestion, Loader2 } from "lucide-react";
 
 import { Button } from "@/components/ui/Button";
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/core/utils";
 import { EmailField } from "../fields/EmailField";
-import { validateEmail } from "@/lib/validation/auth";
-import { forgotPasswordRequest } from "@/lib/auth/authClient";
+import { validateEmail } from "@/lib/auth/validation/auth";
+import { forgotPasswordRequest } from "@/lib/auth/client/authClient";
 
 type ApiError = Error & { statusCode?: number };
 

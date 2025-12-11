@@ -7,7 +7,7 @@ import {
   verifyAccessToken,
   verifyRefreshToken,
 } from "./jwtService";
-import { HttpError } from "../errors";
+import { HttpError } from "../../core/errors";
 import type { User } from "@/types/user";
 
 // --------------------

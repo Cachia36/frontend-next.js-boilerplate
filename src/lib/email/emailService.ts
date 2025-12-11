@@ -1,7 +1,7 @@
 import type { EmailProvider } from "./emailProvider";
 import { consoleEmailProvider } from "./providers/consoleEmailProvider";
 import { resendEmailProvider } from "./providers/resendEmailProvider";
-import { NODE_ENV, RESEND_API_KEY } from "../env";
+import { NODE_ENV, RESEND_API_KEY } from "../core/env";
 
 let provider: EmailProvider;
 

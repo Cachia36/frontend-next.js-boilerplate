@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/core/utils";
 import { ThemeToggle } from "../../ui/ThemeToggle";
 import { AuthActions } from "@/components/auth/AuthActions";
 import type { NavLink } from "./NavLinks";

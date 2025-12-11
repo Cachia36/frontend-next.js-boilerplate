@@ -1,11 +1,11 @@
 import type { User, DbUser } from "@/types/user";
-import { HttpError } from "../errors";
-import { repo } from "./repositories/currentRepo";
+import { HttpError } from "../../core/errors";
+import { repo } from "../repositories/currentRepo";
 import { hashPassword, verifyPassword } from "./passwordService";
 import { generateAccessToken, generateRefreshToken, verifyAccessToken } from "./jwtService";
 import type { AuthTokenPayload } from "@/types/auth";
-import { logAuthEvent } from "../logger";
-import { Unauthorized, Conflict } from "../errors";
+import { logAuthEvent } from "../../core/logger";
+import { Unauthorized, Conflict } from "../../core/errors";
 
 export type AuthResult = {
   user: User;

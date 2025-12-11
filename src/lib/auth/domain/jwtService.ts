@@ -1,8 +1,8 @@
 // src/lib/auth/jwtService.ts
 import jwt from "jsonwebtoken";
 import type { User } from "@/types/user";
-import { JWT_SECRET, JWT_REFRESH_SECRET } from "../env";
-import { Unauthorized } from "../errors";
+import { JWT_SECRET, JWT_REFRESH_SECRET } from "../../core/env";
+import { Unauthorized } from "../../core/errors";
 import { AuthTokenPayload } from "@/types/auth";
 
 const ACCESS_EXPIRES_IN = "15m";

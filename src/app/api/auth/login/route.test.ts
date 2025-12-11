@@ -83,11 +83,11 @@ vi.mock("@/lib/withApiRoute", () => ({
 // ----------------------
 
 import { POST } from "./route";
-import { authService } from "@/lib/auth/authService";
-import { checkRateLimit } from "@/lib/rateLimiter";
-import { logAuthEvent } from "@/lib/logger";
-import { emailSchema, passwordSchema } from "@/lib/validation/authSchemas";
-import { HttpError } from "@/lib/errors";
+import { authService } from "@/lib/auth/domain/authService";
+import { checkRateLimit } from "@/lib/http/rateLimiter";
+import { logAuthEvent } from "@/lib/core/logger";
+import { emailSchema, passwordSchema } from "@/lib/auth/validation/authSchemas";
+import { HttpError } from "@/lib/core/errors";
 
 const mockLogin = (authService as any).login as ReturnType<typeof vi.fn>;
 const mockCheckRateLimit = checkRateLimit as unknown as ReturnType<typeof vi.fn>;

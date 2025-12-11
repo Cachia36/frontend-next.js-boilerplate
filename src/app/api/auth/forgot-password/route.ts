@@ -2,12 +2,12 @@ import { NextResponse } from "next/server";
 import crypto from "crypto";
 import { repo } from "@/lib/auth/repositories/currentRepo";
 import { sendPasswordResetEmail } from "@/lib/email/emailService";
-import { APP_URL, NODE_ENV } from "@/lib/env";
-import { checkRateLimit } from "@/lib/rateLimiter";
-import { logAuthEvent } from "@/lib/logger";
-import { emailSchema } from "@/lib/validation/authSchemas";
-import { withApiRoute } from "@/lib/withApiRoute";
-import { TooManyRequests } from "@/lib/errors";
+import { APP_URL, NODE_ENV } from "@/lib/core/env";
+import { checkRateLimit } from "@/lib/http/rateLimiter";
+import { logAuthEvent } from "@/lib/core/logger";
+import { emailSchema } from "@/lib/auth/validation/authSchemas";
+import { withApiRoute } from "@/lib/http/withApiRoute";
+import { TooManyRequests } from "@/lib/core/errors";
 
 const handler = async (req: Request): Promise<Response> => {
   const ip = req.headers.get("x-forwarded-for") ?? req.headers.get("x-real-ip") ?? "unknown";

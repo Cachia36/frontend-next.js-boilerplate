@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { ZodError } from "zod";
-import { HttpError, toApiError } from "./errors";
-import { logError, logWarn } from "./logger";
+import { HttpError, toApiError } from "../core/errors";
+import { logError, logWarn } from "../core/logger";
 
 const DEFAULT_ERROR = {
   status: 500,

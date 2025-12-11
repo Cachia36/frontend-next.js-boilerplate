@@ -2,9 +2,9 @@
 
 import { useEffect, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/core/utils";
 import { useTheme } from "@/hooks/useTheme";
-import { logoutRequest } from "@/lib/auth/authClient"; // getCurrentUser removed
+import { logoutRequest } from "@/lib/auth/client/authClient"; // getCurrentUser removed
 import { ThemeToggle } from "../../ui/ThemeToggle";
 import { NAV_LINKS } from "./NavLinks";
 import { MobileMenu } from "./MobileMenu";

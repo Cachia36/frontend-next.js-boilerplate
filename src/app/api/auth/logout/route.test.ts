@@ -60,7 +60,7 @@ vi.mock("@/lib/withApiRoute", () => ({
 // ----------------------
 
 import { POST } from "./route";
-import { logAuthEvent } from "@/lib/logger";
+import { logAuthEvent } from "@/lib/core/logger";
 
 const mockLogAuthEvent = logAuthEvent as unknown as ReturnType<typeof vi.fn>;
 

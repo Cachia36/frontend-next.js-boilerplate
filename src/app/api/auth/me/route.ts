@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
-import { authService } from "@/lib/auth/authService";
-import { HttpError } from "@/lib/errors";
-import { logAuthEvent } from "@/lib/logger";
-import { withApiRoute } from "@/lib/withApiRoute";
+import { authService } from "@/lib/auth/domain/authService";
+import { HttpError } from "@/lib/core/errors";
+import { logAuthEvent } from "@/lib/core/logger";
+import { withApiRoute } from "@/lib/http/withApiRoute";
 
 const handler = async (req: Request): Promise<Response> => {
   try {

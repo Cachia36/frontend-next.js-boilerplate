@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
-import { logAuthEvent } from "@/lib/logger";
-import { NODE_ENV } from "@/lib/env";
-import { withApiRoute } from "@/lib/withApiRoute";
+import { logAuthEvent } from "@/lib/core/logger";
+import { NODE_ENV } from "@/lib/core/env";
+import { withApiRoute } from "@/lib/http/withApiRoute";
 
 const handler = async (): Promise<Response> => {
   const res = NextResponse.json({ message: "Logged out successfully" }, { status: 200 });

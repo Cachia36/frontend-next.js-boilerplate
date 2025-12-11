@@ -76,10 +76,10 @@ vi.mock("@/lib/withApiRoute", () => ({
 // ----------------------
 
 import { POST } from "./route";
-import { authService } from "@/lib/auth/authService";
+import { authService } from "@/lib/auth/domain/authService";
 import { repo } from "@/lib/auth/repositories/currentRepo";
-import { passwordSchema } from "@/lib/validation/authSchemas";
-import { logAuthEvent } from "@/lib/logger";
+import { passwordSchema } from "@/lib/auth/validation/authSchemas";
+import { logAuthEvent } from "@/lib/core/logger";
 
 const mockResetPassword = (authService as any).resetPassword as ReturnType<typeof vi.fn>;
 const mockFindByPasswordResetToken = repo.findByPasswordResetToken as unknown as ReturnType<

@@ -1,5 +1,5 @@
 import { MongoClient, Db } from "mongodb";
-import { MONGODB_URI, MONGODB_DB_NAME, PERSISTENCE_DRIVER } from "../env";
+import { MONGODB_URI, MONGODB_DB_NAME, PERSISTENCE_DRIVER } from "../core/env";
 
 let cachedClient: MongoClient | null = null;
 let cachedDb: Db | null = null;

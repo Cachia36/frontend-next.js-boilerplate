@@ -2,7 +2,7 @@ import { ObjectId } from "mongodb";
 import type { DbUser, UserRole } from "@/types/user";
 import type { UserRepository, CreateUserInput } from "./userRepository";
 import { getDb } from "@/lib/db/mongoClient";
-import { NotFound, Conflict } from "@/lib/errors";
+import { NotFound, Conflict } from "@/lib/core/errors";
 
 type UserDocument = {
   _id?: ObjectId;

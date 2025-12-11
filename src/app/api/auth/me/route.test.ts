@@ -62,9 +62,9 @@ vi.mock("@/lib/withApiRoute", () => ({
 // ----------------------
 
 import { GET } from "./route";
-import { authService } from "@/lib/auth/authService";
-import { logAuthEvent } from "@/lib/logger";
-import { HttpError } from "@/lib/errors";
+import { authService } from "@/lib/auth/domain/authService";
+import { logAuthEvent } from "@/lib/core/logger";
+import { HttpError } from "@/lib/core/errors";
 
 const mockGetUserFromAccessToken = (authService as any).getUserFromAccessToken as ReturnType<
   typeof vi.fn

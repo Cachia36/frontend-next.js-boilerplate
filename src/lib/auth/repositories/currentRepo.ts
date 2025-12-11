@@ -1,7 +1,7 @@
 import type { UserRepository } from "./userRepository";
 import { memoryUserRepository } from "./userRepository.memory";
 import { mongoUserRepository } from "./userRepository.mongo";
-import { PERSISTENCE_DRIVER } from "@/lib/env";
+import { PERSISTENCE_DRIVER } from "@/lib/core/env";
 
 const driver = PERSISTENCE_DRIVER ?? "memory";
 

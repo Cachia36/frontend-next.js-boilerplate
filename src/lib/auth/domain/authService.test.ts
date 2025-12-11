@@ -25,11 +25,11 @@ vi.mock("../logger", () => ({
 }));
 
 import { authService } from "./authService";
-import { HttpError } from "../errors";
-import { repo } from "./repositories/currentRepo";
+import { HttpError } from "../../core/errors";
+import { repo } from "../repositories/currentRepo";
 import { hashPassword, verifyPassword } from "./passwordService";
 import { generateAccessToken, generateRefreshToken, verifyAccessToken } from "./jwtService";
-import { logAuthEvent } from "../logger";
+import { logAuthEvent } from "../../core/logger";
 
 const mockRepo = repo as unknown as {
   findByEmail: ReturnType<typeof vi.fn>;

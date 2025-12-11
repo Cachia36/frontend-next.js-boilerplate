@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { HttpError } from "@/lib/errors";
+import { HttpError } from "@/lib/core/errors";
 
 // ----------------------
 // Mocks (before imports)
@@ -102,9 +102,9 @@ import { POST } from "./route";
 import crypto from "crypto";
 import { repo } from "@/lib/auth/repositories/currentRepo";
 import { sendPasswordResetEmail } from "@/lib/email/emailService";
-import { checkRateLimit } from "@/lib/rateLimiter";
-import { logAuthEvent } from "@/lib/logger";
-import { emailSchema } from "@/lib/validation/authSchemas";
+import { checkRateLimit } from "@/lib/http/rateLimiter";
+import { logAuthEvent } from "@/lib/core/logger";
+import { emailSchema } from "@/lib/auth/validation/authSchemas";
 
 const mockRandomBytes = crypto.randomBytes as unknown as ReturnType<typeof vi.fn>;
 const mockFindByEmail = repo.findByEmail as unknown as ReturnType<typeof vi.fn>;
