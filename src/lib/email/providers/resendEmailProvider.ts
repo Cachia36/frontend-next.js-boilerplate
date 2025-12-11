@@ -7,7 +7,7 @@ const resend = new Resend(RESEND_API_KEY!);
 export const resendEmailProvider: EmailProvider = {
   async sendPasswordReset(to, resetLink) {
     const { error } = await resend.emails.send({
-      from: "Your App <noreply@yourdomain.com>",
+      from: "Authentication App <noreply@next-js-boilerplate.com>",
       to,
       subject: "Reset your password",
       html: `
