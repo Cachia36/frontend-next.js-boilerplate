@@ -5,7 +5,7 @@ type SectionProps = {
   id?: string;
   children: ReactNode;
   className?: string;
-  mt?: "none" | "lg"; // simple toggle so you can control the first section
+  mt?: "none" | "lg";
 };
 
 export function Section({ id, children, className, mt = "lg" }: SectionProps) {

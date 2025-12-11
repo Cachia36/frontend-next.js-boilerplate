@@ -5,7 +5,7 @@ import { useRouter, usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { useTheme } from "@/hooks/useTheme";
 import { logoutRequest } from "@/lib/auth/authClient"; // getCurrentUser removed
-import { ThemeToggle } from "../ThemeToggle";
+import { ThemeToggle } from "../../ui/ThemeToggle";
 import { NAV_LINKS } from "./NavLinks";
 import { MobileMenu } from "./MobileMenu";
 import { DesktopNavbar } from "./DesktopNavbar";

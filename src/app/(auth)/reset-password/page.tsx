@@ -1,5 +1,5 @@
 import { Suspense } from "react";
-import { AuthPageShell } from "@/components/layout/AuthPageShell";
+import { AuthPageShell } from "@/components/auth/AuthPageShell";
 import { ResetPasswordCard } from "@/components/auth/cards/ResetPasswordCard";
 
 export default function ResetPasswordPage() {

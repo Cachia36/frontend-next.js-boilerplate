@@ -1,4 +1,4 @@
-import { AuthPageShell } from "@/components/layout/AuthPageShell";
+import { AuthPageShell } from "@/components/auth/AuthPageShell";
 import { LoginCard } from "@/components/auth/cards/LoginCard";
 
 export default function LoginPage() {

@@ -1,10 +1,10 @@
 import Link from "next/link";
 import type { Metadata } from "next";
-import { PageShell } from "@/components/layout/page-shell";
-import { Section } from "@/components/layout/section";
-import { PageHeader } from "@/components/layout/page-header";
+import { PageShell } from "@/components/layout/PageShell";
+import { Section } from "@/components/ui/Section";
+import { PageHeader } from "@/components/layout/PageHeader";
 import { FeatureCard } from "@/components/layout/FeatureCard";
-import { Pill } from "@/components/layout/pill";
+import { Pill } from "@/components/ui/Pill";
 
 export const metadata: Metadata = {
   title: "Next.js Auth Boilerplate",

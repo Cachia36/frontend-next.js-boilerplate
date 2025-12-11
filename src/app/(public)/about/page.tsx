@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
-import { PageShell } from "@/components/layout/page-shell";
-import { Section } from "@/components/layout/section";
-import { PageHeader } from "@/components/layout/page-header";
+import { PageShell } from "@/components/layout/PageShell";
+import { Section } from "@/components/ui/Section";
+import { PageHeader } from "@/components/layout/PageHeader";
 
 export const metadata: Metadata = {
   title: "About | Next.js Auth Boilerplate",

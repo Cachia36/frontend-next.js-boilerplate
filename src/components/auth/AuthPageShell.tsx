@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { PageShell } from "./page-shell";
+import { PageShell } from "../layout/PageShell";
 
 type AuthPageShellProps = {
   children: ReactNode;

@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { cn } from "@/lib/utils";
-import { ThemeToggle } from "../ThemeToggle";
+import { ThemeToggle } from "../../ui/ThemeToggle";
 import { AuthActions } from "@/components/auth/AuthActions";
 import type { NavLink } from "./NavLinks";
 
