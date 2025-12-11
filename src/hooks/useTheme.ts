@@ -4,10 +4,10 @@ import { useLocalStorage } from "./useLocalStorage";
 export type Theme = "light" | "dark" | "system";
 
 const STORAGE_KEY = "app:theme";
+const COOKIE_KEY = "app_theme";
 
 function getSystemTheme(): "light" | "dark" {
   if (typeof window === "undefined") return "light";
-
   return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
 }
 
@@ -29,22 +29,33 @@ function applyTheme(theme: Theme) {
 }
 
 export function useTheme() {
-  const [theme, setTheme] = useLocalStorage<Theme>(STORAGE_KEY, "system");
+  const [storedTheme, setStoredTheme] = useLocalStorage<Theme>(STORAGE_KEY, "system");
+
+  const setTheme = (next: Theme) => {
+    setStoredTheme(next);
+
+    if (typeof document !== "undefined") {
+      const effective = next === "system" ? getSystemTheme() : next;
+
+      //cookie stores the effective theme: light or dark
+      document.cookie = `${COOKIE_KEY}=${effective}; path=/; max-age=31536000; samesite=lax`;
+    }
+  };
 
   useEffect(() => {
-    applyTheme(theme);
-  }, [theme]);
+    applyTheme(storedTheme);
+  }, [storedTheme]);
 
   const toggleTheme = () => {
-    const effective = theme === "system" ? getSystemTheme() : theme;
+    const effective = storedTheme === "system" ? getSystemTheme() : storedTheme;
     const next = effective === "light" ? "dark" : "light";
 
     setTheme(next);
   };
 
   return {
-    theme,
+    theme: storedTheme,
     toggleTheme,
-    effectiveTheme: theme === "system" ? getSystemTheme() : theme,
+    effectiveTheme: storedTheme === "system" ? getSystemTheme() : storedTheme,
   };
 }

@@ -27,12 +27,22 @@ const themeInitCode = `
   (function() {
     try {
       var STORAGE_KEY = 'app:theme';
-      var stored = localStorage.getItem(STORAGE_KEY);
+      var stored = localStorage.getItem(STORAGE_KEY) || 'system';
       var systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-      var theme = stored || (systemDark ? 'dark' : 'light');
+      var effective = stored === 'system'
+        ? (systemDark ? 'dark' : 'light')
+        : stored;
 
       var root = document.documentElement;
-      root.dataset.theme = theme;
+      root.dataset.theme = effective;
+
+      if (effective === 'dark') {
+        root.style.setProperty('--background', '#0a0a0a');
+        root.style.setProperty('--foreground', '#e5e5e5');
+      } else {
+        root.style.setProperty('--background', '#fafafa');
+        root.style.setProperty('--foreground', '#1a1a1a');
+      }
     } catch (e) {
       // fail silently
     }
@@ -43,13 +53,16 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
   const cookieStore = await cookies();
   const accessToken = cookieStore.get("access_token")?.value;
 
+  // Theme from cookie (effective: "light" | "dark")
+  const themeCookie = cookieStore.get("app_theme")?.value;
+  const effectiveTheme = themeCookie === "dark" ? "dark" : "light"; // default to light if missing
+
   let user: { id: string; role?: string } | null = null;
 
   if (accessToken) {
     try {
       user = await authService.getUserFromAccessToken(accessToken);
     } catch {
-      // invalid / expired token → treat as logged out
       user = null;
     }
   }
@@ -58,7 +71,7 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
   const isAdmin = user?.role === "admin";
 
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en" suppressHydrationWarning data-theme={effectiveTheme}>
       <head>
         <Script
           id="theme-init"
