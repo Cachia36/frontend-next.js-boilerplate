@@ -42,7 +42,7 @@ describe("LoginCard", () => {
 
     // Email and password validation come from Zod via validateEmail/validatePassword
     expect(await screen.findByText("Email is required")).toBeTruthy();
-    expect(await screen.findByText("Password must be at least 8 characters")).toBeTruthy();
+    expect(await screen.findByText("Password is required")).toBeTruthy();
 
     expect(loginRequestMock).not.toHaveBeenCalled();
   });
