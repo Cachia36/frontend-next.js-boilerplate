@@ -5,7 +5,7 @@ import Link from "next/link";
 import { LogIn, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 
-import { validateEmail, validatePassword } from "@/lib/auth/domain/validation/auth";
+import { validateEmail } from "@/lib/auth/domain/validation/auth";
 import { cn } from "@/lib/core/utils";
 import { EmailField } from "../fields/EmailField";
 import { PasswordField } from "../fields/PasswordField";
@@ -29,12 +29,19 @@ export function LoginCard() {
 
   const clearFormMessage = () => setFormMessage(null);
 
+  const validatePasswordForLogin = (value: string): string | undefined => {
+    if (value.trim() === "") {
+      return "Password is required";
+    }
+    return undefined;
+  };
+
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (isSubmitting) return;
 
     const emailErr = validateEmail(email);
-    const passwordErr = validatePassword(password);
+    const passwordErr = validatePasswordForLogin(password);
 
     const nextErrors: FieldErrors = { email: emailErr, password: passwordErr };
 
@@ -119,13 +126,13 @@ export function LoginCard() {
             if (fieldErrors.password) {
               setFieldErrors((prev) => ({
                 ...prev,
-                password: validatePassword(value),
+                password: validatePasswordForLogin(value),
               }));
             }
             if (formMessage) clearFormMessage();
           }}
           onBlur={(value) => {
-            const err = validatePassword(value);
+            const err = validatePasswordForLogin(value);
             setFieldErrors((prev) => ({ ...prev, password: err }));
           }}
           onToggleShow={() => setShowPassword((prev) => !prev)}

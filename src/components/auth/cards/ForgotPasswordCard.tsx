@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
+import { useState, useEffect, type FormEvent } from "react";
 import Link from "next/link";
 import { MailQuestion, Loader2 } from "lucide-react";
 
@@ -12,6 +12,8 @@ import { forgotPasswordRequest } from "@/lib/auth/client/authClient";
 
 type ApiError = Error & { statusCode?: number };
 
+const RESEND_COOLDOWN_SECONDS = 30; // change to 60 or whatever you like
+
 export function ForgotPasswordCard() {
   const [email, setEmail] = useState("");
   const [fieldError, setFieldError] = useState<string | undefined>();
@@ -19,11 +21,31 @@ export function ForgotPasswordCard() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
 
+  // New: cooldown state
+  const [cooldown, setCooldown] = useState(0);
+
   const clearFormMessage = () => setFormMessage(null);
+
+  // New: countdown effect
+  useEffect(() => {
+    if (cooldown <= 0) return;
+
+    const intervalId = window.setInterval(() => {
+      setCooldown((prev) => {
+        if (prev <= 1) {
+          window.clearInterval(intervalId);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => window.clearInterval(intervalId);
+  }, [cooldown]);
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (isSubmitting) return;
+    if (isSubmitting || cooldown > 0) return; // prevent spam
 
     const emailErr = validateEmail(email);
     if (emailErr) {
@@ -39,6 +61,7 @@ export function ForgotPasswordCard() {
       await forgotPasswordRequest(email);
 
       setShowSuccess(true);
+      setCooldown(RESEND_COOLDOWN_SECONDS); // start cooldown
     } catch (err: unknown) {
       const error = err as ApiError;
       if (error.statusCode === 429) {
@@ -50,6 +73,15 @@ export function ForgotPasswordCard() {
       setIsSubmitting(false);
     }
   };
+
+  const isButtonDisabled = isSubmitting || cooldown > 0;
+
+  const buttonLabel = (() => {
+    if (isSubmitting) return "Sending reset link...";
+    if (cooldown > 0) return `Wait ${cooldown}s to resend email`;
+    if (showSuccess) return "Resend email";
+    return "Send reset link";
+  })();
 
   return (
     <div
@@ -108,19 +140,19 @@ export function ForgotPasswordCard() {
 
         <Button
           type="submit"
-          disabled={isSubmitting}
+          disabled={isButtonDisabled}
           className={cn(
             "mt-1 flex h-12 w-full items-center justify-center gap-2 rounded-full text-base font-semibold",
-            isSubmitting && "cursor-not-allowed opacity-70",
+            isButtonDisabled && "cursor-not-allowed opacity-70",
           )}
         >
           {isSubmitting ? (
             <>
               <Loader2 className="h-5 w-5 animate-spin" />
-              Sending reset link...
+              {buttonLabel}
             </>
           ) : (
-            "Send reset link"
+            buttonLabel
           )}
         </Button>
 
