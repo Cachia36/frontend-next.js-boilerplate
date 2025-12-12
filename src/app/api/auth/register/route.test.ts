@@ -47,6 +47,11 @@ vi.mock("@/lib/auth/domain/authService", () => ({
   },
 }));
 
+// rate limiter
+vi.mock("@/lib/http/rateLimiter", () => ({
+  checkRateLimit: vi.fn(),
+}));
+
 // validation schemas
 vi.mock("@/lib/auth/domain/validation/authSchemas", () => ({
   emailSchema: {
@@ -55,11 +60,6 @@ vi.mock("@/lib/auth/domain/validation/authSchemas", () => ({
   passwordSchema: {
     parse: vi.fn(),
   },
-}));
-
-// logger
-vi.mock("@/lib/core/logger", () => ({
-  logAuthEvent: vi.fn(),
 }));
 
 // env
@@ -79,19 +79,21 @@ vi.mock("@/lib/http/withApiRoute", () => ({
 import { POST } from "./route";
 import { authService } from "@/lib/auth/domain/authService";
 import { emailSchema, passwordSchema } from "@/lib/auth/domain/validation/authSchemas";
-import { logAuthEvent } from "@/lib/core/logger";
+import { checkRateLimit } from "@/lib/http/rateLimiter";
 
+const mockCheckRateLimit = checkRateLimit as unknown as ReturnType<typeof vi.fn>;
 const mockRegister = (authService as any).register as ReturnType<typeof vi.fn>;
 const mockEmailParse = (emailSchema as any).parse as ReturnType<typeof vi.fn>;
 const mockPasswordParse = (passwordSchema as any).parse as ReturnType<typeof vi.fn>;
-const mockLogAuthEvent = logAuthEvent as unknown as ReturnType<typeof vi.fn>;
 
 describe("POST /api/auth/register", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    mockCheckRateLimit.mockReset();
+    mockCheckRateLimit.mockReturnValue({ allowed: true }); // default: no rate limit in tests
   });
 
-  it("registers a user, returns 201, sets cookies and logs event", async () => {
+  it("registers a user, returns 201, sets cookies", async () => {
     mockEmailParse.mockReturnValueOnce("user@example.com");
     mockPasswordParse.mockReturnValueOnce("Password1");
 
@@ -156,11 +158,6 @@ describe("POST /api/auth/register", () => {
       maxAge: 7 * 24 * 60 * 60,
       secure: true,
       sameSite: "lax",
-    });
-
-    // logAuthEvent
-    expect(mockLogAuthEvent).toHaveBeenCalledWith("register_success", {
-      userId: "user-1",
     });
   });
 });

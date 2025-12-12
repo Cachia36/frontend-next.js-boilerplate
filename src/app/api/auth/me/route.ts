@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import { authService } from "@/lib/auth/domain/authService";
 import { HttpError } from "@/lib/core/errors";
-import { logAuthEvent } from "@/lib/core/logger";
 import { withApiRoute } from "@/lib/http/withApiRoute";
 
 const handler = async (req: Request): Promise<Response> => {
@@ -24,11 +23,6 @@ const handler = async (req: Request): Promise<Response> => {
   } catch (error: unknown) {
     // Token invalid or user missing → treat as logged out
     if (error instanceof HttpError && (error.statusCode === 401 || error.statusCode === 404)) {
-      logAuthEvent("me_token_invalid_or_user_missing", {
-        statusCode: error.statusCode,
-        code: error.code,
-      });
-
       return NextResponse.json({ user: null }, { status: 200 });
     }
 

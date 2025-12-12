@@ -40,11 +40,6 @@ vi.mock("next/server", () => {
   };
 });
 
-// logger
-vi.mock("@/lib/core/logger", () => ({
-  logAuthEvent: vi.fn(),
-}));
-
 // env – default to production so we assert secure: true
 vi.mock("@/lib/core/env", () => ({
   NODE_ENV: "production",
@@ -60,16 +55,13 @@ vi.mock("@/lib/http/withApiRoute", () => ({
 // ----------------------
 
 import { POST } from "./route";
-import { logAuthEvent } from "@/lib/core/logger";
-
-const mockLogAuthEvent = logAuthEvent as unknown as ReturnType<typeof vi.fn>;
 
 describe("POST /api/auth/logout", () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
-  it("clears access and refresh tokens, logs event, and returns success message", async () => {
+  it("clears access and refresh tokens, and returns success message", async () => {
     const req = new Request("http://localhost/api/auth/logout", {
       method: "POST",
     });
@@ -106,7 +98,5 @@ describe("POST /api/auth/logout", () => {
       sameSite: "lax",
     });
 
-    // Logging
-    expect(mockLogAuthEvent).toHaveBeenCalledWith("logout_success");
   });
 });

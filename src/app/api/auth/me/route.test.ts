@@ -145,7 +145,7 @@ describe("GET /api/auth/me", () => {
   // Invalid token -> HttpError 401/404 -> user: null, log, 200
   // ---------------------------------------------------------------------------
 
-  it("returns user: null and logs when token is invalid (HttpError 401)", async () => {
+  it("returns user: null when token is invalid (HttpError 401)", async () => {
     const error = new HttpError(401, "Invalid token", "TOKEN_INVALID");
     mockGetUserFromAccessToken.mockRejectedValueOnce(error);
 
@@ -161,14 +161,9 @@ describe("GET /api/auth/me", () => {
     expect(mockGetUserFromAccessToken).toHaveBeenCalledWith("badtoken");
     expect(res.status).toBe(200);
     expect(res.body).toEqual({ user: null });
-
-    expect(mockLogAuthEvent).toHaveBeenCalledWith("me_token_invalid_or_user_missing", {
-      statusCode: 401,
-      code: "TOKEN_INVALID",
-    });
   });
 
-  it("returns user: null and logs when user is missing (HttpError 404)", async () => {
+  it("returns user: null when user is missing (HttpError 404)", async () => {
     const error = new HttpError(404, "User not found", "USER_NOT_FOUND");
     mockGetUserFromAccessToken.mockRejectedValueOnce(error);
 
@@ -184,11 +179,6 @@ describe("GET /api/auth/me", () => {
     expect(mockGetUserFromAccessToken).toHaveBeenCalledWith("token123");
     expect(res.status).toBe(200);
     expect(res.body).toEqual({ user: null });
-
-    expect(mockLogAuthEvent).toHaveBeenCalledWith("me_token_invalid_or_user_missing", {
-      statusCode: 404,
-      code: "USER_NOT_FOUND",
-    });
   });
 
   // ---------------------------------------------------------------------------

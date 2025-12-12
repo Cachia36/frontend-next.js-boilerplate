@@ -77,11 +77,6 @@ vi.mock("@/lib/http/rateLimiter", () => ({
   checkRateLimit: vi.fn(),
 }));
 
-// logger
-vi.mock("@/lib/core/logger", () => ({
-  logAuthEvent: vi.fn(),
-}));
-
 // validation
 vi.mock("@/lib/auth/domain/validation/authSchemas", () => ({
   emailSchema: {
@@ -103,7 +98,6 @@ import crypto from "crypto";
 import { repo } from "@/lib/auth/repositories/currentRepo";
 import { sendPasswordResetEmail } from "@/lib/email/emailService";
 import { checkRateLimit } from "@/lib/http/rateLimiter";
-import { logAuthEvent } from "@/lib/core/logger";
 import { emailSchema } from "@/lib/auth/domain/validation/authSchemas";
 
 const mockRandomBytes = crypto.randomBytes as unknown as ReturnType<typeof vi.fn>;
@@ -111,7 +105,6 @@ const mockFindByEmail = repo.findByEmail as unknown as ReturnType<typeof vi.fn>;
 const mockSetPasswordResetToken = repo.setPasswordResetToken as unknown as ReturnType<typeof vi.fn>;
 const mockSendPasswordResetEmail = sendPasswordResetEmail as unknown as ReturnType<typeof vi.fn>;
 const mockCheckRateLimit = checkRateLimit as unknown as ReturnType<typeof vi.fn>;
-const mockLogAuthEvent = logAuthEvent as unknown as ReturnType<typeof vi.fn>;
 const mockEmailParse = (emailSchema as any).parse as ReturnType<typeof vi.fn>;
 
 describe("POST /api/auth/forgot-password", () => {
@@ -129,7 +122,7 @@ describe("POST /api/auth/forgot-password", () => {
   // Rate limited
   // ---------------------------------------------------------------------------
 
-  it("returns 429 and logs event when rate limit exceeded", async () => {
+  it("returns 429", async () => {
     const ip = "1.2.3.4";
 
     mockCheckRateLimit.mockReturnValueOnce({
@@ -162,18 +155,13 @@ describe("POST /api/auth/forgot-password", () => {
     expect(mockFindByEmail).not.toHaveBeenCalled();
     expect(mockSetPasswordResetToken).not.toHaveBeenCalled();
     expect(mockSendPasswordResetEmail).not.toHaveBeenCalled();
-
-    expect(mockLogAuthEvent).toHaveBeenCalledWith("forgot_password_rate_limited", {
-      ip,
-      retryAfterSeconds: 120,
-    });
   });
 
   // ---------------------------------------------------------------------------
   // Nonexistent email (no user)
   // ---------------------------------------------------------------------------
 
-  it("responds 200 and logs event even if user does not exist", async () => {
+  it("responds 200", async () => {
     const ip = "5.6.7.8";
 
     mockCheckRateLimit.mockReturnValueOnce({ allowed: true });
@@ -206,11 +194,6 @@ describe("POST /api/auth/forgot-password", () => {
     // should NOT set token or send email
     expect(mockSetPasswordResetToken).not.toHaveBeenCalled();
     expect(mockSendPasswordResetEmail).not.toHaveBeenCalled();
-
-    expect(mockLogAuthEvent).toHaveBeenCalledWith("forgot_password_nonexistent_email", {
-      email: "user@example.com",
-      ip,
-    });
   });
 
   // ---------------------------------------------------------------------------
@@ -275,12 +258,6 @@ describe("POST /api/auth/forgot-password", () => {
       "user@example.com",
       "http://app.test/reset-password?token=fixed-token",
     );
-
-    // log
-    expect(mockLogAuthEvent).toHaveBeenCalledWith("forgot_password_requested", {
-      userId: "user-1",
-      ip,
-    });
 
     // response (NODE_ENV mocked as "development" => includes resetToken)
     expect(res.status).toBe(200);

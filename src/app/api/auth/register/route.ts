@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import { authService } from "@/lib/auth/domain/authService";
 import { emailSchema, passwordSchema } from "@/lib/auth/domain/validation/authSchemas";
-import { logAuthEvent } from "@/lib/core/logger";
 import { NODE_ENV } from "@/lib/core/env";
 import { withApiRoute } from "@/lib/http/withApiRoute";
 import { checkRateLimit } from "@/lib/http/rateLimiter";
@@ -13,11 +12,6 @@ const handler = async (req: Request): Promise<Response> => {
   const rate = checkRateLimit(`register:${ip}`, { max: 10, windowMs: 60_000 });
 
   if (!rate.allowed) {
-    logAuthEvent("register_rate_limited", {
-      ip,
-      retryAfterSeconds: rate.retryAfterSeconds ?? 60,
-    });
-
     throw TooManyRequests(
       "Too many reset attempts. Please try again later.",
       "RATE_LIMIT_EXCEEDED",
@@ -55,8 +49,6 @@ const handler = async (req: Request): Promise<Response> => {
     secure: isProd,
     sameSite: "lax",
   });
-
-  logAuthEvent("register_success", { userId: result.user.id });
 
   return res;
 };

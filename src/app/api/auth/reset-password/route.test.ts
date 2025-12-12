@@ -61,11 +61,6 @@ vi.mock("@/lib/auth/domain/validation/authSchemas", () => ({
   },
 }));
 
-// logger
-vi.mock("@/lib/core/logger", () => ({
-  logAuthEvent: vi.fn(),
-}));
-
 // withApiRoute – return handler directly so POST === handler
 vi.mock("@/lib/http/withApiRoute", () => ({
   withApiRoute: (handler: any) => handler,
@@ -79,14 +74,12 @@ import { POST } from "./route";
 import { authService } from "@/lib/auth/domain/authService";
 import { repo } from "@/lib/auth/repositories/currentRepo";
 import { passwordSchema } from "@/lib/auth/domain/validation/authSchemas";
-import { logAuthEvent } from "@/lib/core/logger";
 
 const mockResetPassword = (authService as any).resetPassword as ReturnType<typeof vi.fn>;
 const mockFindByPasswordResetToken = repo.findByPasswordResetToken as unknown as ReturnType<
   typeof vi.fn
 >;
 const mockPasswordParse = (passwordSchema as any).parse as ReturnType<typeof vi.fn>;
-const mockLogAuthEvent = logAuthEvent as unknown as ReturnType<typeof vi.fn>;
 
 describe("POST /api/auth/reset-password", () => {
   beforeEach(() => {
@@ -100,7 +93,7 @@ describe("POST /api/auth/reset-password", () => {
   it("resets password when token and password are valid", async () => {
     const token = "reset-token";
     const rawPassword = "NewPassword1";
-    const parsedPassword = "NewPassword1"; // same in this case
+    const parsedPassword = "NewPassword1";
 
     mockPasswordParse.mockReturnValueOnce(parsedPassword);
 
@@ -136,9 +129,6 @@ describe("POST /api/auth/reset-password", () => {
     // Service call
     expect(mockResetPassword).toHaveBeenCalledWith("user-1", parsedPassword);
 
-    // Logging
-    expect(mockLogAuthEvent).toHaveBeenCalledWith("password_reset_completed", { userId: "user-1" });
-
     // Response
     expect(res.status).toBe(200);
     expect(res.body).toEqual({
@@ -168,7 +158,6 @@ describe("POST /api/auth/reset-password", () => {
     expect(mockPasswordParse).not.toHaveBeenCalled();
     expect(mockFindByPasswordResetToken).not.toHaveBeenCalled();
     expect(mockResetPassword).not.toHaveBeenCalled();
-    expect(mockLogAuthEvent).not.toHaveBeenCalled();
   });
 
   // ---------------------------------------------------------------------------
@@ -198,6 +187,5 @@ describe("POST /api/auth/reset-password", () => {
     expect(mockPasswordParse).toHaveBeenCalledWith("NewPassword1");
     expect(mockFindByPasswordResetToken).toHaveBeenCalledWith(token);
     expect(mockResetPassword).not.toHaveBeenCalled();
-    expect(mockLogAuthEvent).not.toHaveBeenCalled();
   });
 });

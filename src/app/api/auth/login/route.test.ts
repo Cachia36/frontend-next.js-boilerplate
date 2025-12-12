@@ -53,11 +53,6 @@ vi.mock("@/lib/http/rateLimiter", () => ({
   checkRateLimit: vi.fn(),
 }));
 
-// logger
-vi.mock("@/lib/core/logger", () => ({
-  logAuthEvent: vi.fn(),
-}));
-
 // validation schemas
 vi.mock("@/lib/auth/domain/validation/authSchemas", () => ({
   emailSchema: {
@@ -85,13 +80,11 @@ vi.mock("@/lib/http/withApiRoute", () => ({
 import { POST } from "./route";
 import { authService } from "@/lib/auth/domain/authService";
 import { checkRateLimit } from "@/lib/http/rateLimiter";
-import { logAuthEvent } from "@/lib/core/logger";
 import { emailSchema, passwordSchema } from "@/lib/auth/domain/validation/authSchemas";
 import { HttpError } from "@/lib/core/errors";
 
 const mockLogin = (authService as any).login as ReturnType<typeof vi.fn>;
 const mockCheckRateLimit = checkRateLimit as unknown as ReturnType<typeof vi.fn>;
-const mockLogAuthEvent = logAuthEvent as unknown as ReturnType<typeof vi.fn>;
 const mockEmailParse = (emailSchema as any).parse as ReturnType<typeof vi.fn>;
 const mockPasswordParse = (passwordSchema as any).parse as ReturnType<typeof vi.fn>;
 
@@ -181,12 +174,6 @@ describe("POST /api/auth/login", () => {
       secure: true,
       sameSite: "lax",
     });
-
-    // logAuthEvent
-    expect(mockLogAuthEvent).toHaveBeenCalledWith("login_success", {
-      userId: "user-1",
-      ip,
-    });
   });
 
   // ---------------------------------------------------------------------------
@@ -230,12 +217,6 @@ describe("POST /api/auth/login", () => {
     expect(mockEmailParse).not.toHaveBeenCalled();
     expect(mockPasswordParse).not.toHaveBeenCalled();
     expect(mockLogin).not.toHaveBeenCalled();
-
-    // logAuthEvent for rate limiting
-    expect(mockLogAuthEvent).toHaveBeenCalledWith("login_rate_limited", {
-      ip,
-      retryAfterSeconds: 42,
-    });
   });
 
   // ---------------------------------------------------------------------------

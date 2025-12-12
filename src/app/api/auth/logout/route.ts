@@ -1,5 +1,4 @@
 import { NextResponse } from "next/server";
-import { logAuthEvent } from "@/lib/core/logger";
 import { NODE_ENV } from "@/lib/core/env";
 import { withApiRoute } from "@/lib/http/withApiRoute";
 
@@ -23,8 +22,6 @@ const handler = async (): Promise<Response> => {
     secure: isProd,
     sameSite: "lax",
   });
-
-  logAuthEvent("logout_success");
 
   return res;
 };

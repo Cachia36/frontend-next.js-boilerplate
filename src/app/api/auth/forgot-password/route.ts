@@ -4,7 +4,6 @@ import { repo } from "@/lib/auth/repositories/currentRepo";
 import { sendPasswordResetEmail } from "@/lib/email/emailService";
 import { APP_URL, NODE_ENV } from "@/lib/core/env";
 import { checkRateLimit } from "@/lib/http/rateLimiter";
-import { logAuthEvent } from "@/lib/core/logger";
 import { emailSchema } from "@/lib/auth/domain/validation/authSchemas";
 import { withApiRoute } from "@/lib/http/withApiRoute";
 import { TooManyRequests } from "@/lib/core/errors";
@@ -18,11 +17,6 @@ const handler = async (req: Request): Promise<Response> => {
   });
 
   if (!rate.allowed) {
-    logAuthEvent("forgot_password_rate_limited", {
-      ip,
-      retryAfterSeconds: rate.retryAfterSeconds ?? 60,
-    });
-
     throw TooManyRequests(
       "Too many reset attempts. Please try again later.",
       "RATE_LIMIT_EXCEEDED",
@@ -39,11 +33,6 @@ const handler = async (req: Request): Promise<Response> => {
 
   // Always respond success to avoid leaking user existence
   if (!user) {
-    logAuthEvent("forgot_password_nonexistent_email", {
-      email: normalizedEmail,
-      ip,
-    });
-
     return NextResponse.json(
       { message: "If that email exists, a reset link has been sent." },
       { status: 200 },
@@ -56,9 +45,13 @@ const handler = async (req: Request): Promise<Response> => {
   await repo.setPasswordResetToken(user.id, resetToken, expiresAt);
 
   const resetLink = `${APP_URL}/reset-password?token=${resetToken}`;
-  await sendPasswordResetEmail(normalizedEmail, resetLink);
 
-  logAuthEvent("forgot_password_requested", { userId: user.id, ip });
+  // wrapped with try/catch block in case resend fails.
+  try {
+    await sendPasswordResetEmail(normalizedEmail, resetLink);
+  } catch {
+    // intentionally ignored
+  }
 
   const responseBody: Record<string, unknown> = {
     message: "If that email exists, a reset link has been sent.",
