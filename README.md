@@ -1,207 +1,81 @@
- Next.js Auth Boilerplate
 
-Next.js Auth Boilerplate
-========================
+Next.js Authentication Boilerplate
+==================================
 
-A production-leaning **Next.js authentication boilerplate** built with:
+A modern, production-ready authentication boilerplate built with **Next.js App Router**, designed to be reusable, secure, and easy to extend for real-world applications.
 
-*   Next.js (App Router)
-*   TypeScript
-*   JWT-based auth (access + refresh tokens)
-*   Tailwind CSS (v4)
-*   Vitest for testing
-*   GitHub Actions for CI
+Next.js (App Router) TypeScript JWT HTTP-only cookies Zod Vitest GitHub Actions Tailwind shadcn/ui
 
-This project is designed as a **portfolio piece** and a solid starting point for real-world apps that need authentication, clean architecture, and good developer experience.
-
-* * *
+This project focuses on **clean architecture**, **security best practices**, and **testability**, making it suitable both as a starting point for new projects and as a portfolio showcase.
 
 ✨ Features
 ----------
 
-### Core stack
+*   **Complete authentication flow**: register, login, logout
+*   **Secure password hashing**
+*   **Access & refresh token** strategy using HTTP-only cookies
+*   **Password reset**: token-based reset with expiration + rate-limited requests
+*   **Clean architecture**: domain/services/repositories separated from API routes
+*   **Testing**: unit & integration tests for API routes with mocked dependencies
+*   **CI-ready**: automated test runs via GitHub Actions
+*   **Reusable**: intended as a boilerplate for future full-stack apps
 
-*   **Framework:** Next.js (App Router, app/ directory)
-*   **Language:** TypeScript (strict mode)
-*   **Styling:** Tailwind CSS v4 with a small design system
-*   **Icons:** lucide-react / react-icons
+🛠 Tech Stack
+-------------
 
-### Authentication
+*   **Next.js 14+** (App Router)
+*   **TypeScript**
+*   **Node.js**
+*   **JWT** (access & refresh tokens)
+*   **HTTP-only cookies**
+*   **Zod** (validation)
+*   **Vitest** (testing)
+*   **GitHub Actions** (CI)
+*   **Tailwind CSS** + **shadcn/ui**
 
-*   Email + password authentication
-*   JWT access tokens (short-lived) and refresh tokens (longer-lived)
-*   HttpOnly cookies for better security
-*   Central authService with clear separation of concerns
-*   In-memory UserRepository behind a repository interface, easy to swap to a real DB
-*   Rate limiting on login / forgot password endpoints
-*   Password reset flow with reset token + expiry
-
-### API & backend
-
-*   API routes under src/app/api
-*   Centralised error handling via withApiRoute
-*   Health check endpoint (/api/health)
-*   Zod-based request validation (authSchemas)
-
-### Frontend & UX
-
-*   Public landing page with feature overview
-*   Auth pages: /login, /register, /forgot-password, /reset-password
-*   Protected dashboard (/dashboard) and admin section (/admin)
-*   Layout components: PageShell, Section, PageHeader
-*   Light/dark mode toggle stored in localStorage
-*   Reusable UI primitives like Button
-
-### DX & Quality
-
-*   ESLint with Next.js + TypeScript presets
-*   Prettier with Tailwind plugin
-*   Vitest for services and API route tests
-*   Env validation with Zod (env.ts)
-*   GitHub Actions workflow for CI
-
-* * *
-
-🗂 Project Structure
+📁 Project Structure
 --------------------
 
-src/
-  app/
-    (auth)/
-    admin/
-    api/
-    dashboard/
-    about/
-    layout.tsx
-    page.tsx
-    error.tsx
-    not-found.tsx
-    globals.css
+    src/
+    ├── app/
+    │   └── api/
+    │       └── auth/        # Auth API routes
+    ├── lib/
+    │   ├── auth/
+    │   │   ├── domain/      # Business logic & validation
+    │   │   ├── services/    # Auth services (JWT, password, etc.)
+    │   │   └── repositories/# Data access layer
+    │   ├── core/            # Errors, logging, rate limiting
+    │   └── http/            # API helpers & middleware
+    ├── components/
+    │   └── auth/            # UI auth components
+    └── tests/               # API & service tests
 
-  components/
-  hooks/
-  lib/
-    auth/
-    email/
-    validation/
-  types/
+🔒 Security Considerations
+--------------------------
 
-middleware.ts
+*   Passwords are never stored in plain text
+*   Tokens are stored in **HTTP-only cookies**
+*   Rate limiting is applied to sensitive endpoints
+*   Sensitive fields are stripped from public user objects
+*   Centralised error handling
 
-* * *
+🧪 Testing & CI
+---------------
 
-🔐 Authentication Flow (High-Level)
------------------------------------
+*   Tests cover registration, login, password reset, and error scenarios
+*   CI pipeline runs tests automatically on push
 
-1.  **Register**
-    *   POST /api/auth/register
-    *   Validates with Zod
-    *   Creates user via UserRepository
-    *   Issues and sets JWT cookies
-2.  **Login**
-    *   POST /api/auth/login
-    *   Rate limited
-    *   Rotates tokens on success
-3.  **Protected pages**
-    *   middleware.ts checks access token
-    *   Redirects based on auth state
-4.  **Refresh token**
-    *   POST /api/auth/refresh
-    *   Issues new access token
-5.  **Forgot / reset password**
-    *   POST /api/auth/forgot-password creates token
-    *   POST /api/auth/reset-password updates password
-
-* * *
-
-🚀 Getting Started
-------------------
-
-### Prerequisites
-
-*   Node.js 20+
-*   npm or equivalent
-
-### 1\. Clone the repo
-
-git clone <your-repo-url> next-auth-boilerplate
-cd next-auth-boilerplate
-
-### 2\. Install dependencies
-
-npm install
-
-### 3\. Configure environment variables
-
-Create a `.env.local` file:
-
-NODE\_ENV=development
-JWT\_SECRET=your-super-secret-key
-JWT\_REFRESH\_SECRET=your-refresh-secret-key
-NEXT\_PUBLIC\_APP\_URL=http://localhost:3000
-EMAIL\_API\_KEY=your-email-api-key
-
-### 4\. Run the dev server
-
-npm run dev
-
-### 5\. Run tests
-
-npm test
-
-### 6\. Lint & format
-
-npm run lint
-npm run format
-
-* * *
-
-🧱 Swapping the In-Memory Repo for a Real DB
---------------------------------------------
-
-The active repository is wired in `src/lib/auth/currentRepo.ts`. Replace it with your real database implementation by:
-
-1.  Creating a new repository that implements UserRepository.
-2.  Swapping the import in currentRepo.ts.
-
-* * *
-
-🧪 Testing
+🚧 Purpose
 ----------
 
-Tests cover:
-
-*   Auth services
-*   JWT + password helpers
-*   Env parsing
-*   Rate limiter
-*   API routes
-
-npm test
-
-* * *
-
-🧰 Tooling
-----------
-
-*   ESLint with Next.js + TS
-*   Prettier with Tailwind plugin
-*   Vitest
-*   GitHub Actions CI
-
-* * *
-
-📝 Notes & Next Steps
----------------------
-
-*   Plug in a real DB
-*   Add a real email provider
-*   Implement full RBAC
-*   Add full integration tests
-
-* * *
+*   A reusable authentication boilerplate
+*   A portfolio project showcasing backend & frontend architecture
+*   A foundation for future full-stack applications
 
 📄 License
 ----------
 
-This project is intended as a portfolio / boilerplate project. Choose the license that best fits your needs (MIT is recommended).
+MIT
+
+Tip: If you want, I can also output a lighter version (white background) for portfolio pages.
