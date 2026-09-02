@@ -7,6 +7,16 @@ extend for real-world applications.
 ## 🌐 Live Demo
 https://next-js-authentication-boilerplate.vercel.app/
 
+### 🔑 Demo Admin Account
+
+To explore the admin functionality, you can log in using the following demo account:
+
+- **Email:** `admin.prod@example.com`
+- **Password:** `N8!qV4@rT7#kM2$xP5`
+- **Role:** `Admin`
+
+> This account is provided for demonstration purposes only.
+
 ![Next.js](https://img.shields.io/badge/Next.js-App%20Router-black)
 ![TypeScript](https://img.shields.io/badge/TypeScript-Ready-blue)
 ![Tests](https://img.shields.io/badge/tests-vitest-green)
